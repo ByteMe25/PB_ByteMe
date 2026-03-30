@@ -1,0 +1,13 @@
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.EasyMDEContainer {
+  height: 100%;
+}
+
+.CodeMirror {
+  height: 100% !important;
+}

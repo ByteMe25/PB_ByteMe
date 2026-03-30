@@ -1,13 +1,28 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
+import viteTsconfigPaths from 'vite-tsconfig-paths';
 
-// https://vite.dev/config/
+
+
 export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
+  base: './',
+  plugins: [react(), viteTsconfigPaths()],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/testing/setup-tests.ts',
+    exclude: ['**/node_modules/**', '**/e2e/**'],
+    coverage: {
+      include: ['src/**'],
     },
   },
-})
+  optimizeDeps: { exclude: ['fsevents'] },
+  build: {
+    rollupOptions: {
+      external: ['fs/promises'],
+      output: {
+        experimentalMinChunkSize: 3500,
+      },
+    },
+  },
+});
