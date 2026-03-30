@@ -1,0 +1,66 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: poc-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: poc_db
+    ports:
+      - 5433:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./db/db.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d poc_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+
+  backend:
+    image: poc-backend
+    pull_policy: never
+    # evita di pullare imamagini da internet omonime per sbaglio
+    container_name: poc-backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    volumes:
+      - ./backend/src:/app/src
+      - ./db:/app/db
+      # cambiamenti visibili senza ricostruzione del docker 
+    #command: uvicorn db:app --host 0.0.0.0 --port 8000
+    ports:
+      - 8000:8000
+    environment:  # aggiunte key Zucchetti e secre key sessioni
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL}
+      - PYTHONPATH=/app
+      - FLASK_SECRET_KEY=${FLASK_SECRET_KEY}
+    depends_on:
+      db:
+        condition: service_healthy  # ← aspetta il healthcheck, non solo l'avvio
+
+
+  frontend:  
+    image: poc-frontend
+    pull_policy: never
+    # evita di pullare immagini da internet omonime per sbaglio
+
+    container_name: poc-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    # volumes:
+      # - ./frontend:/usr/share/nginx/html
+      # cambiamenti visibili senza ricostruzione del docker
+    ports:
+      - 8080:80
+    depends_on:
+      - backend
+
+  
+volumes:
+  postgres_data:
+  #default settings per il volume
