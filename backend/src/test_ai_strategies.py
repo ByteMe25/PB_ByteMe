@@ -30,33 +30,52 @@ class TestBaseAIStrategy:
 # ──────────────────────────────────────────────
  
 class TestSimplePromptStrategy:
-    def setup_method(self):
-        self.strategy = SimplePromptStrategy(
-            role="Sei un assistente.",
-            task="Riassumi il testo"
-        )
- 
+
     def test_build_returns_two_strings(self):
-        result = self.strategy.build("Testo di esempio.")
+        strategy = SimplePromptStrategy("Sei un assistente.", "Riassumi il testo")
+        result = strategy.build("Testo di esempio.")
         assert len(result) == 2
         assert all(isinstance(s, str) for s in result)
- 
+
     def test_system_prompt_contains_role(self):
-        system, _ = self.strategy.build("Testo.")
+        strategy = SimplePromptStrategy("Sei un assistente.", "Riassumi il testo")
+        system, _ = strategy.build("Testo.")
         assert "Sei un assistente." in system
- 
+
     def test_system_prompt_contains_no_intro_instruction(self):
-        system, _ = self.strategy.build("Testo.")
+        strategy = SimplePromptStrategy("Sei un assistente.", "Riassumi il testo")
+        system, _ = strategy.build("Testo.")
         assert "NON usare frasi introduttive" in system
- 
+
     def test_user_prompt_contains_task(self):
-        _, user = self.strategy.build("Testo di prova.")
+        strategy = SimplePromptStrategy("Sei un assistente.", "Riassumi il testo")
+        _, user = strategy.build("Testo di prova.")
         assert "Riassumi il testo" in user
- 
+
     def test_user_prompt_contains_input_text(self):
+        strategy = SimplePromptStrategy("Sei un assistente.", "Riassumi il testo")
         input_text = "Questo è il testo da elaborare."
-        _, user = self.strategy.build(input_text)
+        _, user = strategy.build(input_text)
         assert input_text in user
+
+    @pytest.mark.parametrize("key,expected_role,expected_task", [
+        ("summary",
+         "Sei un assistente che riassume testi in italiano in modo chiaro e conciso.",
+         "Fai un riassunto breve e chiaro in italiano di"),
+        ("fix_grammar",
+         "Sei un correttore di bozze che corregge errori grammaticali e ortografici in italiano.",
+         "Correggi eventuali errori grammaticali e ortografici nel seguente testo"),
+        ("rewrite",
+         "Sei un editor che riscrive testi migliorandone la chiarezza e lo stile.",
+         "Riscrivi il seguente testo migliorandone la chiarezza"),
+        ("distant_writing",
+         "Sei uno scrittore creativo che espande idee e concetti.",
+         "Espandi e sviluppa il seguente concetto in un testo più articolato"),
+    ])
+    def test_strategies_dict_content(self, key, expected_role, expected_task):
+        system, user = STRATEGIES[key].build("Testo di prova.")
+        assert expected_role in system
+        assert expected_task in user
  
  
 # ──────────────────────────────────────────────
@@ -169,16 +188,21 @@ class TestStrategiesDict:
         assert isinstance(system, str) and len(system) > 0
         assert isinstance(user, str) and len(user) > 0
  
-    def test_hat_strategies_are_debono(self):
-        hat_keys = ["white_hat", "red_hat", "black_hat", "yellow_hat", "green_hat", "blue_hat"]
+    def test_strategies_are_simpleprompt(self):
+        hat_keys = ["summary", "fix_grammar", "rewrite", "distant_writing"]
         for key in hat_keys:
-            assert isinstance(STRATEGIES[key], DeBonoHatStrategy)
+            assert isinstance(STRATEGIES[key], SimplePromptStrategy)
  
     def test_translate_strategies_are_translation(self):
         translate_keys = ["translate_it", "translate_en", "translate_es",
                           "translate_fr", "translate_de", "translate_zh"]
         for key in translate_keys:
             assert isinstance(STRATEGIES[key], TranslationStrategy)
+            
+    def test_hat_strategies_are_debono(self):
+        hat_keys = ["white_hat", "red_hat", "black_hat", "yellow_hat", "green_hat", "blue_hat"]
+        for key in hat_keys:
+            assert isinstance(STRATEGIES[key], DeBonoHatStrategy)
             
     # ──────────────────────────────────────────────
 # Casi limite
