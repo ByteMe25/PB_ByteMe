@@ -1,6 +1,12 @@
 # ai_model_strategies.py
 import os
 from openai import OpenAI
+from typing import Type
+
+class AIModelStrategy:
+    """Interfaccia comune per tutti i modelli AI"""
+    def generate(self, system_prompt, user_prompt):
+        raise NotImplementedError
 
 _model_instances: dict[str, AIModelStrategy] = {}
 
@@ -9,11 +15,6 @@ def get_model(model_class: Type[AIModelStrategy]) -> AIModelStrategy:
     if key not in _model_instances:
         _model_instances[key] = model_class()
     return _model_instances[key]
-
-class AIModelStrategy:
-    """Interfaccia comune per tutti i modelli AI"""
-    def generate(self, system_prompt, user_prompt):
-        raise NotImplementedError
 
 class ZucchettiLlamaStrategy(AIModelStrategy):
     """Strategia per il modello Llama via infrastruttura Zucchetti"""
