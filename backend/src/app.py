@@ -1,7 +1,7 @@
 #main directory for backend
 
 import os
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from model_strategies import get_model
 from operation_registry import OPERATION_REGISTRY, DEFAULT_OPERATION
@@ -90,7 +90,7 @@ def clean_ai_response(text):
 def root():
     return jsonify({
         #Info api Zucchetti
-        "service": "POC ByteMe Backend",
+        "service": "Second Brain - Backend Flask",
         "ai_configured": bool(ai_client),
         "model": ZUCCHETTI_MODEL if ai_client else None,
         "base_url": OPENAI_BASE_URL if ai_client else None

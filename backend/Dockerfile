@@ -1,4 +1,4 @@
-FROM python:3.14.2-slim
+FROM python:3.12-slim
 # importa un'immagine lightweight (slim) di python già pronta all'uso
 
 WORKDIR /app
@@ -13,8 +13,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Configurazione ambiente
-# PYTHONPATH permette a Python di trovare moduli dentro src
-ENV PYTHONPATH="/app/backend/src"
 EXPOSE 8000
 
 # Comando di avvio (percorso corretto relativo a WORKDIR)

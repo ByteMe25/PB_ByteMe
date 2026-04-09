@@ -1,9 +1,9 @@
 services:
   backend:
-    image: poc-backend
+    image: second-brain-backend
     pull_policy: never
-    # evita di pullare imamagini da internet omonime per sbaglio
-    container_name: poc-backend
+    # evita di pullare immagini da internet omonime per sbaglio
+    container_name: second-brain-backend
     build:
       context: .
       dockerfile: backend/Dockerfile
@@ -19,11 +19,11 @@ services:
 
 
   frontend:  
-    image: poc-frontend
+    image: second-brain-frontend
     pull_policy: never
     # evita di pullare immagini da internet omonime per sbaglio
 
-    container_name: poc-frontend
+    container_name: second-brain-frontend
     build:
       context: ./frontend #guarda solo la cartella frontend
       dockerfile: Dockerfile
