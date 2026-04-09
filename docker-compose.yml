@@ -8,16 +8,14 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     volumes:
-      - ./backend/src:/app/src
-      # cambiamenti visibili senza ricostruzione del docker 
-    #command: uvicorn db:app --host 0.0.0.0 --port 8000
+      - ./backend/src:/app/backend/src
     ports:
       - 8000:8000
     environment:  # aggiunte key Zucchetti e secre key sessioni
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_BASE_URL=${OPENAI_BASE_URL}
-      - PYTHONPATH=/app
       - FLASK_SECRET_KEY=${FLASK_SECRET_KEY}
+      - PYTHONPATH=/app/backend/src
 
 
   frontend:  
@@ -27,11 +25,8 @@ services:
 
     container_name: poc-frontend
     build:
-      context: ./frontend
+      context: ./frontend #guarda solo la cartella frontend
       dockerfile: Dockerfile
-    # volumes:
-      # - ./frontend:/usr/share/nginx/html
-      # cambiamenti visibili senza ricostruzione del docker
     ports:
       - 8080:80
     depends_on:

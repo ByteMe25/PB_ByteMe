@@ -4,24 +4,18 @@ FROM python:3.14.2-slim
 WORKDIR /app
 # cartella di lavoro di default
 
+# Installa le dipendenze
+# copia il file dalla sottocartella locale backend/
 COPY backend/requirements.txt .
-# copia il file requirements.txt nella cartella in WORKDIR
-# requirements.txt specifica le librerie usate da python
-
-RUN apt-get update && apt-get install -y \
-    postgresql-client \
-    && rm -rf /var/lib/apt/lists/*
-# installa client postgres per interagire con db tramite docker exec
-
 RUN pip install --no-cache-dir -r requirements.txt
-# usa contenuti copiati da requirements.txt per installare le librerie python
 
-# COPY src/ .
-# mette src nella cartella di lavoro
-
-# 3. COPIA TUTTO IL RESTO DEL CODICE (Fondamentale!)
+# Copia l'intero progetto per mantenere la struttura /app/backend/src/...
 COPY . .
-# PYTHONPATH serve a Python per trovare la cartella /db fuori da /src
-ENV PYTHONPATH="/app"
+
+# Configurazione ambiente
+# PYTHONPATH permette a Python di trovare moduli dentro src
+ENV PYTHONPATH="/app/backend/src"
 EXPOSE 8000
-CMD ["python", "src/app.py"]
+
+# Comando di avvio (percorso corretto relativo a WORKDIR)
+CMD ["python", "backend/src/app.py"]
