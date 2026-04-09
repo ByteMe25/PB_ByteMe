@@ -6,7 +6,6 @@ Esegui con: pytest test_app.py -v
 import pytest
 import json
 from unittest.mock import patch, MagicMock
-from operation_registry import OPERATION_REGISTRY
  
 # ---------------------------------------------------------------------------
 # FIXTURE: client Flask di test
@@ -83,34 +82,33 @@ class TestGenerateInputValidation:
 # ===========================================================================
  
 class TestGenerateOperations:
-    @pytest.mark.parametrize("operation_name", OPERATION_REGISTRY.keys())
-    def test_all_operations(self, client, operation_name):
-        """
-        Testa automaticamente ogni operazione presente nel registro (summary, fix_grammar, ecc.)
-        """
-        mock_result = f"Risultato simulato per {operation_name}"
+ 
+    @pytest.fixture(autouse=True)
+    def load_registry(self):
+        from operation_registry import OPERATION_REGISTRY
+        self.registry = OPERATION_REGISTRY
+ 
+    @pytest.mark.parametrize("operation_name", [
+        "summary", "fix_grammar", "rewrite", "distant_writing"
+    ])
+    def test_registered_operation_returns_200(self, client, operation_name):
         
+        mock_result = f"Risultato simulato per {operation_name}"
         with patch('app.get_model') as mock_get_model:
             mock_model = MagicMock()
             mock_model.generate.return_value = mock_result
             mock_get_model.return_value = mock_model
-
-            payload = {
+ 
+            response = post_generate(client, {
                 "text": "Testo di prova generico.",
                 "operation": operation_name
-            }
-            
-            response = client.post('/api/ai/generate', json=payload)
-            
+            })
             assert response.status_code == 200
             data = response.get_json()
             assert data["generated_text"] == mock_result
  
     def test_operation_defaults_to_summary_when_missing(self, client):
-        """
-        Se il campo 'operation' non è presente nella richiesta, il backend
-        deve usare l'operazione di default senza errori.
-        """
+       
         with patch('app.get_model') as mock_get_model:
             mock_model = MagicMock()
             mock_model.generate.return_value = "Riassunto automatico."
