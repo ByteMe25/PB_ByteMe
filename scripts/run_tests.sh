@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "Esecuzione test backend prima del push..."
 
-cd "$(git rev-parse --show-toplevel)/backend/src" || exit 1
+cd "$(git rev-parse --show-toplevel)/backend" || exit 1
 
 python3 -m pytest . -v --tb=short
 

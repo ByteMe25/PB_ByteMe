@@ -1,8 +1,9 @@
 import pytest
-from operation_registry import OPERATION_REGISTRY, DEFAULT_OPERATION, OperationConfig
-from ai_strategies import BaseAIStrategy
-import model_strategies
+from src.operation_registry import OPERATION_REGISTRY, DEFAULT_OPERATION, OperationConfig
+from src.ai_strategies import BaseAIStrategy
+import src.model_strategies
 import re
+
 # ---------------------------------------------------------------------------
 # 1. Test di Integrità del Registro
 # ---------------------------------------------------------------------------
@@ -33,14 +34,14 @@ def test_operation_config_structure(op_name):
     assert isinstance(config, OperationConfig)
     
     # Verifica che model_class sia una sottoclasse di AIModelStrategy
-    assert issubclass(config.model_class, model_strategies.AIModelStrategy)
+    assert issubclass(config.model_class, src.model_strategies.AIModelStrategy)
     
     # Verifica che prompt_strategy sia un'istanza di BaseAIStrategy
     assert isinstance(config.prompt_strategy, BaseAIStrategy)
 
 def test_summary_uses_correct_strategy():
     """Verifica specifica che 'summary' usi la strategia di riassunto."""
-    from ai_strategies import SimplePromptStrategy
+    from src.ai_strategies import SimplePromptStrategy
     config = OPERATION_REGISTRY["summary"]
     
     # Controlliamo che il ruolo nel prompt di sistema sia quello di un assistente che riassume
