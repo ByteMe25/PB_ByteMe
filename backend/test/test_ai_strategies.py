@@ -3,10 +3,8 @@
 import pytest
 import sys
 import os
- 
-# Aggiunge la cartella del file originale al path
-sys.path.insert(0, "/mnt/user-data/uploads")
-from ai_strategies import (
+
+from src.ai_strategies import (
     BaseAIStrategy,
     SimplePromptStrategy,
     TranslationStrategy,

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Type
-from ai_strategies import STRATEGIES, BaseAIStrategy
-import model_strategies
+from src.ai_strategies import STRATEGIES, BaseAIStrategy
+from src import model_strategies
 
 @dataclass
 class OperationConfig:

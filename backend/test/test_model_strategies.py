@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import MagicMock, patch
-from model_strategies import ZucchettiLlamaStrategy, Gemma3Strategy, get_model, AIModelStrategy
+from src.model_strategies import ZucchettiLlamaStrategy, Gemma3Strategy, get_model, AIModelStrategy
 from openai import OpenAIError 
 
 # ---------------------------------------------------------------------------
@@ -29,7 +29,7 @@ def test_get_model_returns_singleton():
 # ---------------------------------------------------------------------------
 # 3. Test della Strategia Zucchetti (con Mocking)
 # ---------------------------------------------------------------------------
-@patch('model_strategies.OpenAI') # Simula la classe OpenAI
+@patch('src.model_strategies.OpenAI') # Simula la classe OpenAI
 def test_zucchetti_llama_generate(mock_openai_class):
     """Verifica che la strategia chiami correttamente il client OpenAI."""
     
@@ -60,7 +60,7 @@ def test_zucchetti_llama_generate(mock_openai_class):
     )
 
 # Test per Gemma3Strategy (LLM per 6 cappelli)
-@patch('model_strategies.OpenAI')
+@patch('src.model_strategies.OpenAI')
 def test_gemma3_generate(mock_openai_class):
     mock_client = MagicMock()
     mock_openai_class.return_value = mock_client
@@ -85,7 +85,7 @@ def test_gemma3_generate(mock_openai_class):
     )
 
 
-@patch('model_strategies.OpenAI')
+@patch('src.model_strategies.OpenAI')
 def test_zucchetti_llama_api_error(mock_openai_class):
     """Verifica che la strategia gestisca (o sollevi) errori dall'API."""
     mock_client = MagicMock()
@@ -135,7 +135,7 @@ def test_zucchetti_llama_missing_env_vars():
         # Verifichiamo che il messaggio di errore sia quello giusto
         assert "api_key" in str(excinfo.value)
 
-@patch('model_strategies.OpenAI')
+@patch('src.model_strategies.OpenAI')
 def test_zucchetti_llama_empty_response(mock_openai_class):
     """Verifica che la strategia gestisca una risposta vuota o mancante."""
     mock_client = MagicMock()
@@ -150,10 +150,10 @@ def test_zucchetti_llama_empty_response(mock_openai_class):
     with pytest.raises(IndexError): # O l'errore che ti aspetti
         strategy.generate("sys", "user")
 
-@patch('model_strategies.OpenAI')
+@patch('src.model_strategies.OpenAI')
 def test_get_model_recreation(mock_openai):
     """Verifica che il modello venga ricreato se il registro viene svuotato."""
-    from model_strategies import _model_instances, get_model, ZucchettiLlamaStrategy
+    from src.model_strategies import _model_instances, get_model, ZucchettiLlamaStrategy
     
     # 1. Pulizia iniziale
     _model_instances.clear() 
