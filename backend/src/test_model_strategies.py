@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import MagicMock, patch
-from model_strategies import ZucchettiLlamaStrategy, get_model, AIModelStrategy
+from model_strategies import ZucchettiLlamaStrategy, Gemma3Strategy, get_model, AIModelStrategy
 from openai import OpenAIError 
 
 # ---------------------------------------------------------------------------
@@ -55,8 +55,35 @@ def test_zucchetti_llama_generate(mock_openai_class):
         messages=[
             {"role": "system", "content": "Prompt Sistema"},
             {"role": "user", "content": "Prompt Utente"}
-        ]
+        ],
+        temperature=0.5
     )
+
+# Test per Gemma3Strategy (LLM per 6 cappelli)
+@patch('model_strategies.OpenAI')
+def test_gemma3_generate(mock_openai_class):
+    mock_client = MagicMock()
+    mock_openai_class.return_value = mock_client
+    
+    mock_response = MagicMock()
+    mock_response.choices = [MagicMock(message=MagicMock(content="Risposta Gemma"))]
+    mock_client.chat.completions.create.return_value = mock_response
+
+    strategy = Gemma3Strategy()
+    # Proviamo con una temperatura diversa, come per il Cappello Verde
+    result = strategy.generate("System", "User", temperature=0.8)
+
+    assert result == "Risposta Gemma"
+    # Verifica che chiami ESATTAMENTE gemma3:4b
+    mock_client.chat.completions.create.assert_called_once_with(
+        model="gemma3:4b",
+        messages=[
+            {"role": "system", "content": "System"},
+            {"role": "user", "content": "User"}
+        ],
+        temperature=0.8
+    )
+
 
 @patch('model_strategies.OpenAI')
 def test_zucchetti_llama_api_error(mock_openai_class):

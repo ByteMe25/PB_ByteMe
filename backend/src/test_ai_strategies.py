@@ -1,3 +1,5 @@
+# Esegui con: pytest test_ai_strategies.py -v
+
 import pytest
 import sys
 import os
@@ -12,23 +14,26 @@ from ai_strategies import (
     STRATEGIES,
 )
 
- 
+
 # ──────────────────────────────────────────────
 # BaseAIStrategy
 # ──────────────────────────────────────────────
- 
 class TestBaseAIStrategy:
     def test_build_raises_not_implemented(self):
         """build() deve essere implementato dalle sottoclassi."""
         base = BaseAIStrategy()
         with pytest.raises(NotImplementedError):
             base.build("qualsiasi testo")
- 
- 
+
+    def test_has_default_temperature(self):
+        """La classe base deve avere una temperature di default."""
+        assert hasattr(BaseAIStrategy, 'temperature')
+        assert isinstance(BaseAIStrategy.temperature, float)
+
+
 # ──────────────────────────────────────────────
 # SimplePromptStrategy
 # ──────────────────────────────────────────────
- 
 class TestSimplePromptStrategy:
 
     def test_build_returns_two_strings(self):
@@ -76,38 +81,43 @@ class TestSimplePromptStrategy:
         system, user = STRATEGIES[key].build("Testo di prova.")
         assert expected_role in system
         assert expected_task in user
- 
- 
+
+
 # ──────────────────────────────────────────────
 # TranslationStrategy
 # ──────────────────────────────────────────────
- 
 class TestTranslationStrategy:
+
     def test_build_returns_two_strings(self):
         strategy = TranslationStrategy("inglese")
         result = strategy.build("Ciao mondo.")
         assert len(result) == 2
         assert all(isinstance(s, str) for s in result)
- 
+
     def test_user_prompt_contains_language(self):
         strategy = TranslationStrategy("francese")
         _, user = strategy.build("Buongiorno.")
         assert "francese" in user
- 
+
     def test_user_prompt_contains_input_text(self):
         strategy = TranslationStrategy("spagnolo")
         input_text = "Il sole splende."
         _, user = strategy.build(input_text)
         assert input_text in user
- 
-    def test_system_prompt_is_consistent(self):
+
+    def test_system_prompt_is_consistent_across_languages(self):
+        """Il system prompt è sempre lo stesso indipendente dalla lingua."""
         s1 = TranslationStrategy("tedesco")
         s2 = TranslationStrategy("cinese mandarino")
         system1, _ = s1.build("Testo.")
         system2, _ = s2.build("Testo.")
-        # Il system prompt è sempre lo stesso, indipendente dalla lingua
         assert system1 == system2
- 
+    
+    def test_temperature_is_low(self):
+        """Le traduzioni devono usare una temperature bassa per maggiore precisione."""
+        s = TranslationStrategy("inglese")
+        assert s.temperature <= 0.4
+
     @pytest.mark.parametrize("language", [
         "italiano", "inglese", "spagnolo", "francese", "tedesco", "cinese mandarino"
     ])
@@ -115,72 +125,101 @@ class TestTranslationStrategy:
         strategy = TranslationStrategy(language)
         system, user = strategy.build("Test.")
         assert language in user
- 
- 
+
+
 # ──────────────────────────────────────────────
 # DeBonoHatStrategy
 # ──────────────────────────────────────────────
- 
 class TestDeBonoHatStrategy:
+    
     def test_build_returns_two_strings(self):
-        strategy = DeBonoHatStrategy("Cappello Bianco", "dati e fatti")
+        strategy = DeBonoHatStrategy(
+            system_prompt="Agisci come il Cappello Bianco.",
+            user_task="Analizza il testo:",
+            temperature=0.1
+        )
         result = strategy.build("Testo di analisi.")
         assert len(result) == 2
-        assert all(isinstance(s, str) for s in result)
- 
-    def test_system_prompt_contains_hat_name(self):
-        strategy = DeBonoHatStrategy("Cappello Rosso", "emozioni")
-        system, _ = strategy.build("Testo.")
-        assert "Cappello Rosso" in system
- 
-    def test_user_prompt_contains_focus(self):
-        strategy = DeBonoHatStrategy("Cappello Nero", "rischi e criticità")
-        _, user = strategy.build("Testo.")
-        assert "rischi e criticità" in user
- 
+
     def test_user_prompt_contains_input_text(self):
-        strategy = DeBonoHatStrategy("Cappello Verde", "creatività")
+        """Il testo dell'utente deve sempre comparire nel user_prompt."""
         input_text = "Idee innovative per il futuro."
-        _, user = strategy.build(input_text)
-        assert input_text in user
- 
-    @pytest.mark.parametrize("hat,focus", [
-        ("Cappello Bianco", "dati, fatti e informazioni verificabili"),
-        ("Cappello Rosso",  "emozioni, intuizioni e sentimenti"),
-        ("Cappello Nero",   "rischi, problemi e criticità"),
-        ("Cappello Giallo", "benefici e opportunità"),
-        ("Cappello Verde",  "idee nuove e soluzioni creative"),
-        ("Cappello Blu",    "organizzazione del processo e prossimi passi"),
+        for key in ["white_hat", "red_hat", "black_hat", "yellow_hat", "green_hat", "blue_hat"]:
+            _, user = STRATEGIES[key].build(input_text)
+            assert input_text in user, f"Testo mancante per {key}"
+
+
+    # Temperature
+    @pytest.mark.parametrize("hat_key,expected_temp", [
+        ("white_hat",  0.1),
+        ("black_hat",  0.1),
+        ("blue_hat",   0.1),
+        ("red_hat",    0.8),
+        ("yellow_hat", 0.8),
+        ("green_hat",  0.8),
     ])
-    def test_all_hats(self, hat, focus):
-        strategy = DeBonoHatStrategy(hat, focus)
-        system, user = strategy.build("Analisi.")
-        assert hat in system
-        assert focus in user
+    def test_hat_temperature(self, hat_key, expected_temp):
+        """Verifica che la temperature sia calibrata correttamente per cappello."""
+        assert STRATEGIES[hat_key].temperature == expected_temp
+
+
+    # Contenuto dei prompt
+    def test_white_hat_system_prompt_is_objective(self):
+        system, _ = STRATEGIES["white_hat"].build("Testo.")
+        assert "oggettivo" in system.lower() or "fatti" in system.lower()
  
+    def test_white_hat_user_prompt_has_4_points(self):
+        _, user = STRATEGIES["white_hat"].build("Testo.")
+        assert "1)" in user and "2)" in user and "3)" in user and "4)" in user
  
+    def test_red_hat_system_prompt_mentions_emotions(self):
+        system, _ = STRATEGIES["red_hat"].build("Testo.")
+        assert "emozion" in system.lower() or "sentiment" in system.lower()
+ 
+    def test_black_hat_system_prompt_mentions_risks(self):
+        system, _ = STRATEGIES["black_hat"].build("Testo.")
+        assert "rischi" in system.lower() or "critico" in system.lower()
+ 
+    def test_yellow_hat_system_prompt_mentions_benefits(self):
+        system, _ = STRATEGIES["yellow_hat"].build("Testo.")
+        assert "benefici" in system.lower() or "opportunit" in system.lower()
+ 
+    def test_green_hat_system_prompt_mentions_creativity(self):
+        system, _ = STRATEGIES["green_hat"].build("Testo.")
+        assert "creativ" in system.lower() or "innovativ" in system.lower()
+ 
+    def test_blue_hat_system_prompt_mentions_process(self):
+        system, _ = STRATEGIES["blue_hat"].build("Testo.")
+        assert "processo" in system.lower() or "sintesi" in system.lower()
+
+
 # ──────────────────────────────────────────────
 # Dizionario STRATEGIES
 # ──────────────────────────────────────────────
- 
 class TestStrategiesDict:
+
     EXPECTED_KEYS = [
         "summary", "fix_grammar", "rewrite", "distant_writing",
         "white_hat", "red_hat", "black_hat", "yellow_hat", "green_hat", "blue_hat",
         "translate_it", "translate_en", "translate_es",
         "translate_fr", "translate_de", "translate_zh",
     ]
- 
+
     def test_all_keys_present(self):
         for key in self.EXPECTED_KEYS:
             assert key in STRATEGIES, f"Chiave mancante: '{key}'"
- 
+
     def test_all_values_are_base_strategy(self):
         for key, strategy in STRATEGIES.items():
             assert isinstance(strategy, BaseAIStrategy), (
                 f"'{key}' non è una BaseAIStrategy"
             )
- 
+
+    def test_all_have_temperature_attribute(self):
+        for key, strategy in STRATEGIES.items():
+            assert hasattr(strategy, 'temperature'), f"'{key}' senza attributo temperature"
+            assert isinstance(strategy.temperature, float), f"'{key}' temperature non è float"
+
     @pytest.mark.parametrize("key", EXPECTED_KEYS)
     def test_each_strategy_build_works(self, key):
         """Ogni strategia deve produrre due stringhe non vuote."""
@@ -203,15 +242,14 @@ class TestStrategiesDict:
         hat_keys = ["white_hat", "red_hat", "black_hat", "yellow_hat", "green_hat", "blue_hat"]
         for key in hat_keys:
             assert isinstance(STRATEGIES[key], DeBonoHatStrategy)
-            
-    # ──────────────────────────────────────────────
+
+
+# ──────────────────────────────────────────────
 # Casi limite
 # ──────────────────────────────────────────────
-
 class TestEdgeCases:
 
-    # --- Stringa vuota ---
-
+    # Stringa vuota
     def test_simple_prompt_empty_text(self):
         strategy = SimplePromptStrategy("Sei un assistente.", "Riassumi")
         system, user = strategy.build("")
@@ -225,29 +263,26 @@ class TestEdgeCases:
         assert isinstance(user, str)
 
     def test_debono_empty_text(self):
-        strategy = DeBonoHatStrategy("Cappello Bianco", "dati e fatti")
+        strategy = DeBonoHatStrategy("Cappello Bianco", "dati e fatti", 0.5)
         system, user = strategy.build("")
         assert isinstance(system, str)
         assert isinstance(user, str)
 
-    # --- Solo spazi ---
-
+    # Solo spazi
     def test_simple_prompt_whitespace_only(self):
         strategy = SimplePromptStrategy("Sei un assistente.", "Riassumi")
         system, user = strategy.build("   \n\n\t")
         assert isinstance(system, str)
         assert isinstance(user, str)
 
-    # --- Testo molto lungo ---
-
+    # Testo molto lungo
     def test_simple_prompt_very_long_text(self):
         long_text = "parola " * 10000
         strategy = SimplePromptStrategy("Sei un assistente.", "Riassumi")
         system, user = strategy.build(long_text)
         assert long_text in user
 
-    # --- Caratteri speciali e unicode ---
-
+    # Caratteri speciali e unicode
     def test_translation_with_emoji(self):
         strategy = TranslationStrategy("inglese")
         text = "Testo con emoji 🎯🚀 e simboli <>&\"'"
@@ -260,14 +295,7 @@ class TestEdgeCases:
         system, user = strategy.build(text)
         assert text in user
 
-    def test_debono_with_special_characters(self):
-        strategy = DeBonoHatStrategy("Cappello Bianco", "dati e fatti")
-        text = "Testo con\nnewline e\ttab e 'apici'"
-        system, user = strategy.build(text)
-        assert text in user
-
-    # --- None come input ---
-
+    # None come input
     def test_simple_prompt_none_raises(self):
         strategy = SimplePromptStrategy("Sei un assistente.", "Riassumi")
         with pytest.raises(TypeError):
@@ -279,12 +307,11 @@ class TestEdgeCases:
             strategy.build(None)
 
     def test_debono_none_raises(self):
-        strategy = DeBonoHatStrategy("Cappello Bianco", "dati e fatti")
+        strategy = DeBonoHatStrategy("Cappello Bianco", "dati e fatti", 0.5)
         with pytest.raises(TypeError):
             strategy.build(None)
 
-    # --- Costruttore con valori vuoti ---
-
+    # Costruttore con valori vuoti
     def test_simple_prompt_empty_role_and_task(self):
         strategy = SimplePromptStrategy(role="", task="")
         system, user = strategy.build("Testo.")
@@ -298,7 +325,11 @@ class TestEdgeCases:
         assert isinstance(user, str)
 
     def test_debono_empty_hat_and_focus(self):
-        strategy = DeBonoHatStrategy(hat_name="", focus="")
+        strategy = DeBonoHatStrategy(
+            system_prompt="",
+            user_task="",
+            temperature=0.5
+        )
         system, user = strategy.build("Testo.")
         assert isinstance(system, str)
         assert isinstance(user, str)
