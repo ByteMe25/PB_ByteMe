@@ -1,5 +1,3 @@
-# ai_strategies.py
-
 class BaseAIStrategy:
     """Classe base per definire l'interfaccia delle strategie AI (prompt).
         Ogni sottoclasse implementa build() restituendo una coppia (system_prompt, user_prompt)

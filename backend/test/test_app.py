@@ -125,7 +125,7 @@ class TestCleanAiResponse:
 
     @pytest.fixture(autouse=True)
     def import_clean(self):
-        from src.app import clean_ai_response
+        from src.utils.text_cleaning import clean_ai_response
         self.clean = clean_ai_response
 
     @pytest.mark.parametrize("input_text, expected_output", [

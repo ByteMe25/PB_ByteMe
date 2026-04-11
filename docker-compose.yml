@@ -15,7 +15,7 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_BASE_URL=${OPENAI_BASE_URL}
       - FLASK_SECRET_KEY=${FLASK_SECRET_KEY}
-      - PYTHONPATH=/app/backend/src
+      - PYTHONPATH=/app/backend
 
 
   frontend:  
