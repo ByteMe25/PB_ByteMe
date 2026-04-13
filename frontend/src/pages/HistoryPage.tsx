@@ -1,0 +1,1 @@
+// Vista storico: include Sidebar, TopBar con tasto "Torna" e la lista cronologica
