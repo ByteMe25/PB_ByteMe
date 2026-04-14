@@ -10,3 +10,5 @@ backend/venv/
 # Docker & OS
 .DS_Store
 .env
+
+.vscode/
