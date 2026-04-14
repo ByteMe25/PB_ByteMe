@@ -1,0 +1,82 @@
+/* stile per l'editor, configurazione easyMDE*/
+.editorWrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.75em;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  background: #ffffff;
+  overflow: hidden;
+}
+
+/* =========================================
+   OVERRIDE GLOBALI PER EASYMDE
+   ========================================= */
+.editorWrapper :global(.EasyMDEContainer) {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: none; /* Rimuove il bordo default della libreria */
+}
+
+/* Toolbar */
+.editorWrapper :global(.editor-toolbar) {
+  background-color: var(--bg-header, #f8fafc);
+  border: none;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  padding: 0.5em;
+  opacity: 1;
+}
+
+.editorWrapper :global(.editor-toolbar button) {
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  color: var(--text-muted);
+}
+
+.editorWrapper :global(.editor-toolbar button:hover),
+.editorWrapper :global(.editor-toolbar button.active) {
+  background-color: white;
+  border-color: var(--col-accent);
+  color: var(--col-accent);
+}
+
+/* nasconde separatori vecchi di EasyMDE */
+.editorWrapper :global(.editor-toolbar i.separator) {
+  display: none; 
+}
+
+/* Area di Testo (CodeMirror) */
+.editorWrapper :global(.CodeMirror) {
+  flex: 1;
+  border: none;
+  background-color: transparent;
+  color: var(--text-main);
+  font-family: 'Inter', monospace;
+  font-size: 1rem;
+  line-height: 1.6;
+  padding: 1em;
+}
+
+/* Scroll interno per CodeMirror */
+.editorWrapper :global(.CodeMirror-scroll) {
+  height: 100%;
+  min-height: 100%;
+}
+
+/* Vista side-by-side */
+.editorWrapper :global(.EasyMDEContainer.sided--no-fullscreen) {
+  display: flex;
+  flex-direction: row;
+}
+
+.editorWrapper :global(.editor-preview-side) {
+  flex: 1;
+  border-left: 1px solid rgba(0,0,0,0.08);
+  padding: 1.5em;
+  color: var(--text-main);
+  background-color: var(--bg-editor);
+}

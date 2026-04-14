@@ -1,5 +1,4 @@
 /* Reset e variabili CSS: stile globale */
-
 :root {
   /* =========================================
     VARIABILI GLOBALI - PALET DI COLORI
@@ -21,6 +20,11 @@
   
   /* Bordi e Divisori */
   --border-light: #c7cdda;  /* Colore per linee di separazione */
+
+  /* Colori notifiche React-Toast */
+  --col-success: #45af4a;
+  --col-error: #d32f2f;
+  --bg-toast: var(--bg-editor);
 }
 
 /* =========================================

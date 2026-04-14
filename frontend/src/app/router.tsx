@@ -1,8 +1,8 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { App } from './App';
+import EditorPage from '../pages/EditorPage';
 
-// Creiamo due componenti fittizi per ora, li sposteremo in file separati poi
-const EditorPage = () => <div style={{ padding: '2em' }}><h2>Second Brain Editor</h2></div>;
+// Creiamo un componente fittizio per lo storico per ora
 const HistoryPage = () => <div style={{ padding: '2em' }}><h2>Storico Generazioni</h2></div>;
 
 export const router = createBrowserRouter([

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrainCircuit, X } from 'lucide-react';
+import { Brain, X } from 'lucide-react';
 import styles from './Topbar.module.css';
 
 
@@ -24,7 +24,7 @@ export const Topbar: React.FC<TopbarProps> = ({
       
       {/* logo e nome app */}
         <div className={styles.brand}>
-            <BrainCircuit size={24} color="var(--col-accent)" />
+            <Brain size={24} color="var(--col-accent)" />
             <span className={styles.brandName}>Second Brain</span>
         </div>
 
