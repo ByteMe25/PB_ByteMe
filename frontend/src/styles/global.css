@@ -1,1 +1,45 @@
 /* Reset e variabili CSS: stile globale */
+
+:root {
+  /* =========================================
+    VARIABILI GLOBALI - PALET DI COLORI
+  ========================================= */
+
+  /* Colori di Sfondo */
+  --bg-body: #f8fafc;       /* Sfondo generico della pagina */
+  --bg-header: #b7d8f8;     /* Sfondo per la Topbar e Sidebar (azzurro chiaro)*/
+  --bg-editor: #ffffff;     /* Sfondo bianco puro per il foglio dell'editor */
+  --bg-view: #dbe0e6;       /* Sfondo per l'area di anteprima (più scuro rispetto all'area di testo)*/
+  
+  /* Colori del Testo */
+  --text-main: #08022C;     /* Testo principale (leggibile e blu scuro) */
+  --text-muted: #465B77;    /* Testo secondario, placeholder e icone spente */
+  
+  /* Colori del Brand e interazione/bottoni*/
+  --col-primary: #1e293b;   /* Colore scuro forte (Logo o titoli) */
+  --col-accent: #3b82f6;    /* Colore "Azione" (es. bordi azzurri, bottoni attivi) */
+  
+  /* Bordi e Divisori */
+  --border-light: #c7cdda;  /* Colore per linee di separazione */
+}
+
+/* =========================================
+   RESET DI BASE
+   ========================================= */
+/* impone a tutti gli elementi di calcolare i bordi dentro le dimensioni, 
+   ed elimina margini e padding indesiderati messi dai browser */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* impostazioni generali */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden; 
+}

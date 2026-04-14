@@ -1,0 +1,78 @@
+/* Stile per Topbar */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--bg-header);
+  border-bottom: 0.0625em solid var(--border-light);
+
+  height: 3.75em; 
+  padding: 0 1.25em; 
+}
+
+/* sinistra: logo e nome editor*/
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.625em; 
+}
+
+.brandName {
+  font-weight: bold;
+  font-size: 1.2em;
+  color: var(--col-primary);
+}
+
+/* destra: nome documento e X per chiuderlo */
+.documentArea {
+  display: flex;
+  align-items: center;
+  gap: 0.5em; 
+  background-color: var(--bg-editor);
+  
+  padding: 0.25em 0.375em 0.25em 0.75em;
+  border-radius: 0.375em;
+  border: 0.0625em solid var(--border-light);
+  transition: border-color 0.2s ease;
+}
+
+/* focus all'interno dell'area */
+.documentArea:focus-within {
+  border-color: var(--col-accent);
+}
+
+/* nome documento */
+.titleInput {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 1em; 
+  color: var(--text-main); 
+  width: 12.5em; 
+}
+
+/* placeholder attenuato quando vuoto ("Documento senza titolo") */
+.titleInput::placeholder {
+  color: var(--text-muted);
+}
+
+/* pulsante di chiusura */
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.25em;
+  border-radius: 0.25em;
+  
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+}
+
+/* quando si chiude il doc (hover sulla X)*/
+.closeButton:hover {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
