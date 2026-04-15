@@ -12,13 +12,8 @@ interface TopbarProps {
   onCloseDocument: () => void;
 }
 
-/* React Functional Componente (FC) - Topbar è componente React */
-export const Topbar: React.FC<TopbarProps> = ({
-  documentName,
-  onDocumentNameChange,
-  onCloseDocument,
 
-}) => {
+export const Topbar = ({documentName, onDocumentNameChange, onCloseDocument}: TopbarProps) => {
   return (
     <header className={styles.topbar}>
       

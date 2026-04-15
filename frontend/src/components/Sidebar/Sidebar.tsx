@@ -15,14 +15,7 @@ interface SidebarProps {
 }
 
 
-export const Sidebar: React.FC<SidebarProps> = ({
-  activePage,
-  onNavigate,
-  onUpload,
-  onSave,
-  onPrint,
-  onAiAction
-}) => {
+export const Sidebar = ({ activePage, onNavigate, onUpload, onSave, onPrint, onAiAction }: SidebarProps) => {
   const isHistoryMode = activePage === 'history'; //se la activePage è history si entra in isHistoryMode (true)
 
   return (

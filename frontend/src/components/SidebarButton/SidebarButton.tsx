@@ -10,13 +10,8 @@ interface SidebarButtonProps {
   onClick: () => void;
 }
 
-export const SidebarButton: React.FC<SidebarButtonProps> = ({
-  icon,
-  label,
-  isActive = false,
-  disabled = false,
-  onClick
-}) => {
+
+export const SidebarButton = ({icon, label, isActive = false, disabled = false, onClick}: SidebarButtonProps) => {
   return (
     <button
       // combina le classi CSS in base allo stato

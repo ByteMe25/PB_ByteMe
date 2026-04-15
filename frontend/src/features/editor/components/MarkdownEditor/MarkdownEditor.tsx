@@ -4,13 +4,15 @@ import 'easymde/dist/easymde.min.css'; // CSS base della libreria easyMDE
 import styles from './MarkdownEditor.module.css';
 import toast from 'react-hot-toast';
 
+
 interface MarkdownEditorProps {
   //riceve la ref dal genitore così useEditor può interagire con il testo
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
+  //Dependency Injection per il Drag & Drop (MVVM pattern puro)
+  onFileDrop?: (file: File) => void;
 }
 
-
-export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ textareaRef }) => {
+export const MarkdownEditor = ({ textareaRef, onFileDrop }: MarkdownEditorProps) => {
   //istanza di EasyMDE per poterla distruggere quando il componente si smonta
   const easyMdeInstance = useRef<EasyMDE | null>(null);
 
@@ -154,9 +156,29 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ textareaRef }) =
     };
   }, [textareaRef]);
 
+  // SENSORI PER IL DRAG & DROP
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault(); //serve per drop
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const droppedFile = e.dataTransfer.files[0];
+      //delega la logica al ViewModel/genitore
+      if (onFileDrop) onFileDrop(droppedFile);
+      e.dataTransfer.clearData();
+    }
+  };
+
   return (
-    <div className={styles.editorWrapper}>
-      <textarea ref={textareaRef} />
+    <div 
+      className={styles.editorWrapper}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
+      {/* data-testid per testare il componente in modo indipendente da EasyMDE */}
+      <textarea ref={textareaRef} data-testid="markdown-textarea" />
     </div>
   );
 };
