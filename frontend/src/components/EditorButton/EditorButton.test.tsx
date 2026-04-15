@@ -1,9 +1,9 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { SidebarButton } from './SidebarButton';
+import { EditorButton } from './EditorButton';
 import { FileText } from 'lucide-react';
 
-describe('Componente SidebarButton', () => {
+describe('Componente EditorButton', () => {
   const mockOnClick = vi.fn();
 
   // reset della memoria: pulisce il conteggio dei click tra un test e l'altro
@@ -14,7 +14,7 @@ describe('Componente SidebarButton', () => {
 
   it('renderizza correttamente l\'icona e ha l\'etichetta accessibile (label)', () => {
     render(
-      <SidebarButton
+      <EditorButton
         icon={<FileText size={22} data-testid="test-icon" />}
         label="Bottone Test"
         onClick={mockOnClick}
@@ -31,7 +31,7 @@ describe('Componente SidebarButton', () => {
 
   it('esegue la funzione onClick esattamente una volta quando viene cliccato', () => {
     render(
-      <SidebarButton
+      <EditorButton
         icon={<FileText size={22} />}
         label="Cliccami"
         onClick={mockOnClick}
@@ -48,7 +48,7 @@ describe('Componente SidebarButton', () => {
 
   it('applica lo stato attivo (Active) correttamente', () => {
     render(
-      <SidebarButton
+      <EditorButton
         icon={<FileText size={22} />}
         label="Attivo"
         isActive={true}
@@ -68,7 +68,7 @@ describe('Componente SidebarButton', () => {
 
   it('si disabilita e NON permette il click quando disabled è true', () => {
     render(
-      <SidebarButton
+      <EditorButton
         icon={<FileText size={22} />}
         label="Disabilitato"
         disabled={true}

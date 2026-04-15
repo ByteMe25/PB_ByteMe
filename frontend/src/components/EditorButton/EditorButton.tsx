@@ -1,8 +1,8 @@
 /* Gestione bottoni della Sidebar: stato attivo o disabilitato */
 import React from 'react';
-import styles from './SidebarButton.module.css';
+import styles from './EditorButton.module.css';
 
-interface SidebarButtonProps {
+interface EditorButtonProps {
   icon: React.ReactNode;
   label: string; //per tooltip e accessibilità
   isActive?: boolean; // se true, il bottone si accende
@@ -11,7 +11,7 @@ interface SidebarButtonProps {
 }
 
 
-export const SidebarButton = ({icon, label, isActive = false, disabled = false, onClick}: SidebarButtonProps) => {
+export const EditorButton = ({icon, label, isActive = false, disabled = false, onClick}: EditorButtonProps) => {
   return (
     <button
       // combina le classi CSS in base allo stato

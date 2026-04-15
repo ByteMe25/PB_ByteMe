@@ -1,6 +1,6 @@
 import React from 'react';
 import { TextInitial, History, FileUp, Save, Printer, Sparkles } from 'lucide-react';
-import { SidebarButton } from '../SidebarButton/SidebarButton';
+import { EditorButton } from '../EditorButton/EditorButton';
 import styles from './Sidebar.module.css';
 
 
@@ -23,13 +23,13 @@ export const Sidebar = ({ activePage, onNavigate, onUpload, onSave, onPrint, onA
 
       {/* NAVIGAZIONE: Editor/Storico */}
       <nav className={styles.group}>
-        <SidebarButton
+        <EditorButton
           icon={<TextInitial size={22} />}
           label="Editor"
           isActive={activePage === 'editor'}
           onClick={() => onNavigate('editor')} //azione che parte dopo che l'utente clicca
         />
-        <SidebarButton
+        <EditorButton
           icon={<History size={22} />}
           label="Storico generazioni"
           isActive={activePage === 'history'}
@@ -41,19 +41,19 @@ export const Sidebar = ({ activePage, onNavigate, onUpload, onSave, onPrint, onA
 
       {/* OPERAZIONI FILE (disattivate nello storico) */}
       <div className={styles.group}>
-        <SidebarButton
+        <EditorButton
           icon={<FileUp size={22} />}
           label="Carica File"
           disabled={isHistoryMode}
           onClick={onUpload}
         />
-        <SidebarButton
+        <EditorButton
           icon={<Save size={22} />}
           label="Salva File"
           disabled={isHistoryMode}
           onClick={onSave}
         />
-        <SidebarButton
+        <EditorButton
           icon={<Printer size={22} />}
           label="Stampa"
           disabled={isHistoryMode}
@@ -65,7 +65,7 @@ export const Sidebar = ({ activePage, onNavigate, onUpload, onSave, onPrint, onA
 
       {/* icona AI */}
       <div className={styles.group}>
-        <SidebarButton
+        <EditorButton
           icon={<Sparkles size={22} />}
           label="Operazioni AI"
           disabled={isHistoryMode}
