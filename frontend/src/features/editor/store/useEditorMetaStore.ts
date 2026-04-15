@@ -1,0 +1,1 @@
+/* Store per i metadati dell'editor - Zustand - MODEL */
