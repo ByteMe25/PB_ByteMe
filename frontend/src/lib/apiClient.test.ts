@@ -1,19 +1,18 @@
 // test per apiClient.ts - verifica configurazione, interceptor, supporto AbortSignal e type-safety
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import apiClient, { transformApiError, ApiError } from './apiClient';
-import type { AxiosError } from 'axios';
+import axios, {AxiosError} from 'axios';
 
 
 //invece di fare chiamate HTTP finte (mock di axios), testa direttamente l'interceptor:
 //passiamo oggetti JavaScript semplici (stub) forzandone il tipo con `as AxiosError`
 describe('transformApiError (logica interceptor pura)', () => {
   it('gestisce errore di cancellazione (ERR_CANCELED)', () => {
-    const error = {
-      code: 'ERR_CANCELED',
-      message: 'canceled',
-    } as AxiosError<ApiError>;
+    //crea un vero errore di cancellazione nativo di Axios così axios.isCancel(error) restituisce true
+    const error = new axios.CanceledError('canceled') as any;
     
     const result = transformApiError(error);
+    
     expect(result.name).toBe('CanceledError');
     expect(result.message).toBe('Operazione annullata dall\'utente');
   });
@@ -42,6 +41,16 @@ describe('transformApiError (logica interceptor pura)', () => {
     
     const result = transformApiError(error);
     expect(result.message).toBe('Il prompt non può essere vuoto');
+  });
+
+  it('usa fallback per errore 400 senza messaggio backend', () => {
+    const error = {
+      code: undefined,
+      response: { status: 400, data: {} },
+    } as AxiosError<ApiError>;
+    
+    const result = transformApiError(error);
+    expect(result.message).toBe('Richiesta non valida');
   });
 
 
@@ -106,17 +115,26 @@ describe('transformApiError (logica interceptor pura)', () => {
 
 describe('apiClient configurazione base', () => {
   beforeEach(() => {
-    // vi.stubEnv assicura che il test non dipenda dal file .env locale
+    //isola le variabili d'ambiente per il test
     vi.stubEnv('VITE_API_BASE_URL', '/api');
     vi.stubEnv('VITE_API_TIMEOUT', '30000');
 
-    //forza il reload del modulo per leggere le nuove env, dimentica l'import precedente di apiClient.ts
+    //forza il reload del modulo per leggere le nuove env
     vi.resetModules();
   });
 
+  //pulizia totale dopo ogni test per evitare "leak" di variabili d'ambiente
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it('ha baseURL configurata da env', async () => {
-    //usa import dinamico per importare il modulo dopo aver settato le env variables
-    const { default: apiClient } = await import('./apiClient');
-    expect(apiClient.defaults.baseURL).toBe('/api');
+    const { default: client } = await import('./apiClient');
+    expect(client.defaults.baseURL).toBe('/api');
+  });
+
+  it('ha timeout configurato da env', async () => {
+    const { default: client } = await import('./apiClient');
+    expect(client.defaults.timeout).toBe(30000);
   });
 });

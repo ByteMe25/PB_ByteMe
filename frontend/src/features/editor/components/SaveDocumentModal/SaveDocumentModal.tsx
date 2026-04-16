@@ -67,6 +67,25 @@ export const SaveDocumentModal = ({
     onExport(format, finalFilename);
   };
 
+  //logica inline per i tasti di scelta rapida
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isOpen || isExporting) return;
+      
+      if (e.key === 'Escape') {
+        onClose();
+      }
+      
+      if (e.key === 'Enter' && baseFilename.trim()) {
+        const finalFilename = composeFilename(baseFilename, format);
+        onExport(format, finalFilename);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, isExporting, baseFilename, format, onClose, onExport]); 
+
 
   return (
     <div className={styles.backdrop} onClick={!isExporting ? onClose : undefined}>
