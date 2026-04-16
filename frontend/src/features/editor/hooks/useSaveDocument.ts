@@ -1,4 +1,7 @@
-/* BOZZA DA SISTEMARE */
+/* Coordina la modale di salvataggio: traccia se la modale è aperta o chiusa, 
+ * controlla che il nome del file inserito dall'utente sia valido (non vuoto, senza caratteri proibiti) e
+ * quando l'utente clicca "Conferma" orchestra il download fisico del file e avvisa l'editor di salvare nello storico
+*/
 
 import { useState } from 'react';
 import toast from 'react-hot-toast';
