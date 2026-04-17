@@ -1,4 +1,4 @@
-export interface HistoryItem {
+export interface HistoryEntry {
   id: string;
   timestamp: string;
   operation: string; 

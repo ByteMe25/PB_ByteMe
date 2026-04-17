@@ -1,5 +1,5 @@
 import { test, expect, beforeEach } from 'vitest';
-import { useHistoryStore } from '../stores/HistoryStore';
+import { useHistoryStore } from './useHistoryStore';
 
 // Dati finti riusabili nei test
 const mockEntry = {

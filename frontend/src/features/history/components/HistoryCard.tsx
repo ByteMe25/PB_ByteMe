@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import type { HistoryItem } from '../types/HistoryItem';
+import { useState, useEffect } from 'react';
+import type { HistoryEntry } from '../types/HistoryEntry';
+
 
 //Mappa per associare a ogni operazione un colore
 const OPERATION_COLORS: Record<string, string> = {
@@ -22,21 +23,30 @@ const OPERATION_COLORS: Record<string, string> = {
 };
 
 interface HistoryCardProps {
-  item: HistoryItem;
+  item: HistoryEntry;
   onDelete: (id: string) => void;
 }
 
-export const HistoryCard: React.FC<HistoryCardProps> = ({ item, onDelete }) => {
+
+export const HistoryCard = ({ item, onDelete }: HistoryCardProps) => {
   const [expandedInput, setExpandedInput] = useState(false); //per i mostra tutto, vedi sotto
   const [expandedOutput, setExpandedOutput] = useState(false);
   const [copied, setCopied] = useState(false); //per il copia, vedi sotto
 
   const color = OPERATION_COLORS[item.operation] ?? '#888';
 
+  //useEffect per il memory leak è tornato al suo posto
+  useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout>;
+    if (copied) {
+      timeoutId = setTimeout(() => setCopied(false), 2000);
+    }
+    return () => clearTimeout(timeoutId);
+  }, [copied]);
+
   const handleCopy = async () => {
     await navigator.clipboard.writeText(item.generatedText);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000); //dopo 2 sec rimette il bottone a "copia"
   };
 
   return (
@@ -49,19 +59,19 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({ item, onDelete }) => {
       </header>
 
 
-        <p>{expandedInput ? item.inputText : item.inputText.slice(0, 150)}</p>  {/*Aggiungere i 3 puntini??*/}
-        {item.inputText.length > 150 && (
+        <p>{expandedInput ? item.inputText : `${item.inputText.slice(0, 150)}...`}</p> {/*aggiunti 3 puntini*/}
+      {item.inputText.length > 150 && (
         <button onClick={() => setExpandedInput(prev => !prev)}>
-            {expandedInput ? 'Mostra meno' : 'Mostra tutto'}
+          {expandedInput ? 'Mostra meno' : 'Mostra tutto'}
         </button>
-        )}
+      )}
 
-        <p>{expandedOutput ? item.generatedText : item.generatedText.slice(0, 300)}</p>
-        {item.generatedText.length > 300 && (
+        <p>{expandedOutput ? item.generatedText : `${item.generatedText.slice(0, 300)}...`}</p>
+      {item.generatedText.length > 300 && (
         <button onClick={() => setExpandedOutput(prev => !prev)}>
-            {expandedOutput ? 'Mostra meno' : 'Mostra tutto'}
+          {expandedOutput ? 'Mostra meno' : 'Mostra tutto'}
         </button>
-        )}
+      )}
 
       <footer>
         <button onClick={handleCopy}> {copied ? '✓ Copiato' : 'Copia'} </button>

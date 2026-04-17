@@ -1,12 +1,13 @@
-import { test, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { HistoryPage } from './HistoryPage';
-import { useHistory } from '../hooks/useHistory';
+import { useHistory } from '../../features/history/hooks/useHistory';
 
-//Mock di use useHistory
-vi.mock('../hooks/useHistory', () => ({
+//mock del ViewModel (Hook) - restituisce tutte le entries
+vi.mock('../../features/history/hooks/useHistory', () => ({
   useHistory: vi.fn(),
 }));
+
 
 const mockEntries = [
   {
@@ -29,45 +30,41 @@ const mockEntries = [
 
 beforeEach(() => {
   vi.clearAllMocks();
-});
-
-//Verifica che scrivendo nell'input, la lista si aggiorni mostrando solo gli elementi che contengono quella stringa (nel testo originale o generato)
-test('filtra gli elementi tramite la barra di ricerca', () => {
+  //l'hook restituisce la lista completa non filtrata
   (useHistory as any).mockReturnValue({
     entries: mockEntries,
     isLoading: false,
     error: null,
     deleteEntry: vi.fn(),
   });
+});
 
+
+test('passa il testo di ricerca al ViewModel quando l\'utente scrive', () => {
   render(<HistoryPage />);
-
-  const searchInput = screen.getByPlaceholderText(/cerca/i);
   
+  const searchInput = screen.getByPlaceholderText(/cerca/i);
   fireEvent.change(searchInput, { target: { value: 'Bread' } });
 
-  expect(screen.queryByText('summary')).not.toBeInTheDocument();
-  expect(screen.getByText('translate_it')).toBeInTheDocument();
+  // Verifica che il ViewModel (l'hook) riceva il filtro 'Bread'
+  expect(useHistory).toHaveBeenLastCalledWith(
+    expect.objectContaining({ search: 'Bread' })
+  );
 });
 
-//Verifica che vengano visualizzate solo le operazioni corrispondenti (es. summary in questo caso).
-test('filtra gli elementi tramite il selettore operazione', () => {
-  (useHistory as any).mockReturnValue({
-    entries: mockEntries,
-    isLoading: false,
-    error: null,
-    deleteEntry: vi.fn(),
-  });
 
+test('passa l\'operazione al ViewModel quando l\'utente usa la select', () => {
   render(<HistoryPage />);
 
   const select = screen.getByRole('combobox');
-  
   fireEvent.change(select, { target: { value: 'summary' } });
 
-  expect(screen.getByText('summary')).toBeInTheDocument();
-  expect(screen.queryByText('translate_it')).not.toBeInTheDocument();
+  // Verifica che il ViewModel (l'hook) riceva il filtro 'summary'
+  expect(useHistory).toHaveBeenLastCalledWith(
+    expect.objectContaining({ operation: 'summary' })
+  );
 });
+
 
 //Verifica che la pagina passi correttamente lo stato di isLoading dell'hook al componente HistoryList e che quindi mostri LoadingState
 test('mostra il messaggio di caricamento se l\'hook è in loading', () => {

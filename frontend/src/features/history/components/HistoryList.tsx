@@ -1,24 +1,24 @@
 import React from 'react';
-import type { HistoryItem } from '../types/HistoryItem';
+import type { HistoryEntry } from '../types/HistoryEntry';
 import { HistoryCard } from './HistoryCard';
 
 
 interface HistoryListProps {
-  items: HistoryItem[];
+  items: HistoryEntry[];
   isLoading: boolean;
   error: string | null;
   onDelete: (id: string) => void;
 }
 
 //Per ogni stato appaiono cose diverse, si può semplificare solo con gli if ma così è più separato e chiaro
-
-const EmptyState: React.FC = () => (
-    <div className="emptyState"> {/*Questi div non hanno uno scopo, sono lì se servono per il css*/}
-        <p>Le tue generazioni AI appariranno qui dopo la prima richiesta dall'editor.</p>
-    </div>
+const EmptyState = () => (
+  <div className="emptyState"> {/*Questi div non hanno uno scopo, servono per il css*/}
+    <p>Le tue generazioni AI appariranno qui dopo la prima richiesta dall'editor.</p>
+  </div>
 );
 
-const LoadingState: React.FC = () => (
+
+const LoadingState = () => (
   <div className="loadingState" role="status" aria-label="Caricamento in corso"> 
     {Array.from({ length: 3 }).map((_, i) => ( 
       <div key={i}>
@@ -30,14 +30,13 @@ const LoadingState: React.FC = () => (
   </div>
 );
 
-const ErrorState: React.FC<{ message: string }> = ({ message }) => (
+const ErrorState = ({ message }: { message: string }) => (
   <div className="errorState" role="alert">
     <p>Errore nel caricamento: {message}</p>
   </div>
 );
 
-
-export const HistoryList: React.FC<HistoryListProps> = ({items, isLoading, error, onDelete}) => {
+export const HistoryList = ({ items, isLoading, error, onDelete }: HistoryListProps) => {
   if (isLoading) return <LoadingState />;
   if (error) return <ErrorState message={error} />;
   if (items.length === 0) return <EmptyState />;

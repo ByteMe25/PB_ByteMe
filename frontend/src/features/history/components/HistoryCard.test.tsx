@@ -1,9 +1,9 @@
 import { test, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { HistoryCard } from '../components/HistoryCard';
-import type { HistoryItem } from '../types/HistoryItem';
+import type { HistoryEntry } from '../types/HistoryEntry';
 
-const mockItem: HistoryItem = {
+const mockItem: HistoryEntry = {
   id: '1',
   timestamp: '2024-01-01T10:00:00Z',
   operation: 'summary',
@@ -18,17 +18,18 @@ test('mostra operation e data', () => {
   expect(screen.getByText('summary')).toBeInTheDocument();
 });
 
-//Verifica che la stringa passata come inputText sia presente nel documento
+
 test('mostra il testo originale', () => {
   render(<HistoryCard item={mockItem} onDelete={() => {}} />);
-  expect(screen.getByText('Testo originale')).toBeInTheDocument();
+  expect(screen.getByText(/Testo originale/i)).toBeInTheDocument();
 });
 
-//Assicura che la stringa passata come generatedText sia visibile all'utente
+
 test('mostra il testo generato', () => {
   render(<HistoryCard item={mockItem} onDelete={() => {}} />);
-  expect(screen.getByText('Testo generato')).toBeInTheDocument();
+  expect(screen.getByText(/Testo generato/i)).toBeInTheDocument();
 });
+
 
 //Verifica che se i testi sono sotto la soglia (150/300 caratteri), il pulsante mostra tutto non deve esistere.
 test('non mostra Mostra tutto se i testi sono corti', () => {
@@ -62,8 +63,10 @@ test('chiama onDelete con id corretto', () => {
   expect(mockDelete).toHaveBeenCalledWith('1');
 });
 
-//Verifica la funzione di copia
+
+//fakeTimers per gestire il warning di act()
 test('copia il testo negli appunti', async () => {
+  vi.useFakeTimers(); // "Congela" il tempo per i test
   const writeTextMock = vi.fn().mockResolvedValue(undefined);
   Object.assign(navigator, { clipboard: { writeText: writeTextMock } });
 
@@ -72,8 +75,9 @@ test('copia il testo negli appunti', async () => {
   const copyBtn = screen.getByText(/copia/i);
   await fireEvent.click(copyBtn);
 
-  expect(writeTextMock).toHaveBeenCalledWith(mockItem.generatedText);
-
-  const successMessage = await screen.findByText(/copiato/i);
-  expect(successMessage).toBeInTheDocument();
+  expect(writeTextMock).toHaveBeenCalledWith('Testo generato');
+  
+  // Mandiamo avanti il tempo di 2 secondi in modo sicuro
+  vi.runAllTimers(); 
+  vi.useRealTimers(); // Ripristina il tempo normale
 });

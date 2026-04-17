@@ -1,10 +1,10 @@
 import { test, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { HistoryList } from '../components/HistoryList';
-import type { HistoryItem } from '../types/HistoryItem';
+import type { HistoryEntry } from '../types/HistoryEntry';
 
 //Due perchè testiamo HistoryList
-const mockItems: HistoryItem[] = [
+const mockItems: HistoryEntry[] = [
   {
     id: '1',
     timestamp: '2024-01-01T10:00:00Z',
