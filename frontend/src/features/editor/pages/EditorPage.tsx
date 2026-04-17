@@ -20,6 +20,7 @@ import { Topbar } from '../../../components/Topbar/Topbar';
 import { Sidebar } from '../../../components/Sidebar/Sidebar';
 import { MarkdownEditor } from '../components/MarkdownEditor/MarkdownEditor';
 import { SaveDocumentModal } from '../components/SaveDocumentModal/SaveDocumentModal';
+import { AiPanel } from '../components/AiPanel/AiPanel';
 
 import styles from './EditorPage.module.css';
 import type { ExportFormat } from '../types';
@@ -41,7 +42,7 @@ export const EditorPage = () => {
 
   //VIEWMODEL: salvataggio documento
   const { isOpen: isSaveModalOpen, openModal: openSaveModal, closeModal: closeSaveModal, handleExport, isExporting } = useSaveDocument();
-  
+
   // VIEWMODEL: caricamento file
   const { openFilePicker, uploadFile, isUploading, inputRef, handleFileInput } = useFileUpload(editor.reloadFromStorage);
   //VIEWMODEL: stampa
@@ -88,26 +89,20 @@ export const EditorPage = () => {
            *  - textareaRef: useEditor monta EasyMDE su questo elemento
            *  - onFileDrop: delega al ViewModel useFileUpload
            */}
-          <MarkdownEditor 
-            textareaRef={editor.textareaRef} 
+          <MarkdownEditor
+            textareaRef={editor.textareaRef}
             onFileDrop={uploadFile}
           />
 
-          {/*
-           * AiPanel deve ancora essere fatto, ma placeholder per lo stato aperto/chiuso già gestito
-           * Quando implementato, riceverà:
-           *  - getSelection per ottenere il testo selezionato
-           *  - insertTextAtCursor per inserire il risultato AI
-           *  - onClose per chiudere il pannello
-           *  - onEntryAdded (addEntry) per aggiornare lo Storico
-           */}
           {isAiPanelOpen && (
-            <aside className={styles.aiPanel}>
-              {/* AiPanel andrà qui — placeholder visibile per ora */}
-              <div className={styles.aiPanelPlaceholder}>
-                <p>Pannello AI — in sviluppo</p>
-                <button onClick={() => setIsAiPanelOpen(false)}>✕</button>
-              </div>
+            <aside className={styles.aiPanel_wrap}>
+              <AiPanel
+                getEditorText={editor.getEditorText}
+                getSelection={editor.getSelection}
+                insertTextAtCursor={editor.insertTextAtCursor}
+                onClose={() => setIsAiPanelOpen(false)}
+                onEntryAdded={addHistoryEntry as (entry: unknown) => void}
+              />
             </aside>
           )}
         </main>

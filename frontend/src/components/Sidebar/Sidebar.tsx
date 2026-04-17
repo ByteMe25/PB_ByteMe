@@ -37,7 +37,7 @@ export const Sidebar = ({ activePage, onNavigate, onUpload, onSave, onPrint, onA
         />
       </nav>
 
-      <div className={styles.separator} />
+      <div class="separator" />
 
       {/* OPERAZIONI FILE (disattivate nello storico) */}
       <div className={styles.group}>
