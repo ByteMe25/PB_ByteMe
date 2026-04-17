@@ -39,7 +39,8 @@ export const useEditorMetaStore = create<EditorMetaState>()(
       setFileName: (name: string) => 
         set({ 
           fileName: name, 
-          isDirty: true //cambiare nome equivale a una modifica da salvare
+          //rinomimare il file rende lo stato "sporco" perché il nome corrente non è più allineato con l'ultimo file scaricato
+          isDirty: true
         }),
 
       markSaved: () => 
@@ -57,7 +58,12 @@ export const useEditorMetaStore = create<EditorMetaState>()(
       //nome della chiave dedicata nel localStorage del browser
       name: 'secondbrain-editor-meta',
       version: 0, //versione dello schema per supportare eventuali migrazioni future
-      //nessuna partialize: (state) - in questo caso lo stato è già leggero e non abbiamo bisogno di escludere nulla
+      //salva solo i dati puri, prevenendo comportamenti imprevisti.
+      partialize: (state) => ({
+        fileName: state.fileName,
+        isDirty: state.isDirty,
+        lastSaved: state.lastSaved,
+      }),
     }
   )
 );

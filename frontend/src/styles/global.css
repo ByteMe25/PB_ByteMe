@@ -47,3 +47,42 @@ body {
   width: 100vw;
   overflow: hidden; 
 }
+
+/* ==================================================================
+   REGOLE DI STAMPA - per stampare solo foglio formattato in markdown
+   ================================================================== */
+@media print {
+  /*margini fisici del foglio */
+  @page { margin: 1.5cm; }
+
+  /*nasconde UI dell'app */
+  .sidebar, .topbar { 
+    display: none !important; 
+  }
+
+  /*nasconde UI EasyMDE */
+  .editor-toolbar, 
+  .editor-statusbar {
+    display: none !important;
+  }
+
+  /*nasconde area scrittura (codice sorgente) */
+  .CodeMirror {
+    display: none !important;
+  }
+
+  /*mostra e adatta l'anteprima formattata */
+  .editor-preview {
+    display: block !important;
+    width: 100% !important;
+    border: none !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: transparent !important;
+  }
+
+  /* evita spezzamenti indesiderati tra pagine */
+  h1, h2, h3, h4, h5, h6, p, pre, blockquote, table, ul, ol, li {
+    page-break-inside: avoid;
+  }
+}

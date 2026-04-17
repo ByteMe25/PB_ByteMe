@@ -14,22 +14,21 @@ export const useFileUpload = (onFileLoaded: (text: string) => void) => {
   const [isUploading, setIsUploading] = useState(false);
 
   const processFile = useCallback(async (file: File) => {
-    setIsUploading(true); //start Loader
+    //validazioni sincrone (prima di attivare il loader)
+    const isAllowed = ALLOWED_EXTENSIONS.some(ext => file.name.toLowerCase().endsWith(ext));
+    if (!isAllowed) {
+      toast.error('Formato non supportato. Carica solo file .md o .txt');
+      return; 
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error('Il file supera la dimensione massima di 5MB.');
+      return; 
+    }
+
+    //inizio operazioni asincrone (attiva loader)
+    setIsUploading(true);
     
     try {
-      //validazione estensione
-      const isAllowed = ALLOWED_EXTENSIONS.some(ext => file.name.toLowerCase().endsWith(ext));
-      if (!isAllowed) {
-        toast.error('Formato non supportato. Carica solo file .md o .txt');
-        return; 
-      }
-
-      //validazione dimensione
-      if (file.size > MAX_FILE_SIZE) {
-        toast.error('Il file supera la dimensione massima di 5MB.');
-        return; 
-      }
-
       //controllo dati non salvati
       const { isDirty, setFileName, markSaved } = useEditorMetaStore.getState();
       if (isDirty) {
