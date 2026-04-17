@@ -1,7 +1,7 @@
 import { test, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { HistoryList } from '../components/HistoryList';
-import type { HistoryEntry } from '../types/HistoryEntry';
+import { HistoryList } from './HistoryList';
+import type { HistoryEntry } from '../../types/HistoryEntry';
 
 //Due perchè testiamo HistoryList
 const mockItems: HistoryEntry[] = [

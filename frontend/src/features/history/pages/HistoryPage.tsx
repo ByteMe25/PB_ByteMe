@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { HistoryList } from '../../features/history/components/HistoryList';
-import { useHistory } from '../../features/history/hooks/useHistory';
+import { HistoryList } from '../components/HistoryList/HistoryList';
+import { useHistory } from '../hooks/useHistory';
 
 
 export const HistoryPage = () => {

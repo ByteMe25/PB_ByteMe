@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { HistoryEntry } from '../types/HistoryEntry';
+import type { HistoryEntry } from '../../types/HistoryEntry';
 
 
 //Mappa per associare a ogni operazione un colore

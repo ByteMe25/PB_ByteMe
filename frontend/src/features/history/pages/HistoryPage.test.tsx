@@ -1,10 +1,10 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { HistoryPage } from './HistoryPage';
-import { useHistory } from '../../features/history/hooks/useHistory';
+import { useHistory } from '../hooks/useHistory';
 
 //mock del ViewModel (Hook) - restituisce tutte le entries
-vi.mock('../../features/history/hooks/useHistory', () => ({
+vi.mock('../hooks/useHistory', () => ({
   useHistory: vi.fn(),
 }));
 

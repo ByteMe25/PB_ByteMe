@@ -1,7 +1,7 @@
 import { test, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { HistoryCard } from '../components/HistoryCard';
-import type { HistoryEntry } from '../types/HistoryEntry';
+import { HistoryCard } from './HistoryCard';
+import type { HistoryEntry } from '../../types/HistoryEntry';
 
 const mockItem: HistoryEntry = {
   id: '1',

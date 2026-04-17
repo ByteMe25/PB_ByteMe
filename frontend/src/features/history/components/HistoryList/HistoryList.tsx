@@ -1,6 +1,6 @@
 import React from 'react';
-import type { HistoryEntry } from '../types/HistoryEntry';
-import { HistoryCard } from './HistoryCard';
+import type { HistoryEntry } from '../../types/HistoryEntry';
+import { HistoryCard } from '../HistoryCard/HistoryCard';
 
 
 interface HistoryListProps {
