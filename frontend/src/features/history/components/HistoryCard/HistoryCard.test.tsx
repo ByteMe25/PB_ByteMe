@@ -37,6 +37,12 @@ test('non mostra Mostra tutto se i testi sono corti', () => {
   expect(screen.queryByText('Mostra tutto')).not.toBeInTheDocument();
 });
 
+test('non aggiunge i puntini se il testo è corto', () => {
+  render(<HistoryCard item={mockItem} onDelete={() => {}} />);
+  expect(screen.queryByText(/Testo originale\.\.\./)).not.toBeInTheDocument();
+});
+
+
 //Verifica che se il testo generato supera la soglia (150/300 caratteri) appaia il pulsante mostra tutto
 test('mostra Mostra tutto se il testo generato è lungo', () => {
   const longItem = { ...mockItem, generatedText: 'x'.repeat(301) };

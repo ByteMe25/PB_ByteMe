@@ -59,14 +59,14 @@ export const HistoryCard = ({ item, onDelete }: HistoryCardProps) => {
       </header>
 
 
-        <p>{expandedInput ? item.inputText : `${item.inputText.slice(0, 150)}...`}</p> {/*aggiunti 3 puntini*/}
+        <p>{expandedInput || item.inputText.length <= 150 ? item.inputText : `${item.inputText.slice(0, 150)}...`}</p> {/*aggiunti 3 puntini*/}
       {item.inputText.length > 150 && (
         <button onClick={() => setExpandedInput(prev => !prev)}>
           {expandedInput ? 'Mostra meno' : 'Mostra tutto'}
         </button>
       )}
 
-        <p>{expandedOutput ? item.generatedText : `${item.generatedText.slice(0, 300)}...`}</p>
+        <p>{expandedOutput || item.generatedText.length <= 300 ? item.generatedText : `${item.generatedText.slice(0, 300)}...`}</p>
       {item.generatedText.length > 300 && (
         <button onClick={() => setExpandedOutput(prev => !prev)}>
           {expandedOutput ? 'Mostra meno' : 'Mostra tutto'}
