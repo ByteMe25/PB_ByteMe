@@ -64,7 +64,20 @@ export const useFileUpload = (onFileLoaded: () => void) => {
     }
   }, [onFileLoaded]);
 
-  const openFilePicker = useCallback(() => inputRef.current?.click(), []);
+  const openFilePicker = useCallback(() => {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.md,.txt';
+  
+  input.onchange = (e) => {
+    const target = e.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (file) uploadFile(file);
+    input.remove(); // Pulizia
+  };
+  
+  input.click();
+}, [uploadFile]);
 
   const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

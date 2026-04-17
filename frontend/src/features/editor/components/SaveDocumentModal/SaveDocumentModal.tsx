@@ -46,35 +46,6 @@ export const SaveDocumentModal = ({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isOpen || isExporting) return;
       if (e.key === 'Escape') onClose();
-      if (e.key === 'Enter' && baseFilename.trim()) handleExport();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, isExporting, baseFilename, format]);
-
-  if (!isOpen) return null;
-
-  //handler con sanitizzazione in tempo reale
-  const handleNameChange = (value: string) => {
-    //sanitizza ma NON trimma: l'utente può digitare spazi tra le parole
-    setBaseFilename(sanitizeFilename(value));
-  };
-
-  const handleExport = () => {
-    if (!baseFilename.trim()) return;
-    //composizione finale con trim e estensione
-    const finalFilename = composeFilename(baseFilename, format);
-    onExport(format, finalFilename);
-  };
-
-  //logica inline per i tasti di scelta rapida
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isOpen || isExporting) return;
-      
-      if (e.key === 'Escape') {
-        onClose();
-      }
       
       if (e.key === 'Enter' && baseFilename.trim()) {
         const finalFilename = composeFilename(baseFilename, format);
@@ -85,6 +56,22 @@ export const SaveDocumentModal = ({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, isExporting, baseFilename, format, onClose, onExport]); 
+
+  //handler con sanitizzazione in tempo reale
+  const handleNameChange = (value: string) => {
+    setBaseFilename(sanitizeFilename(value));
+  };
+
+  //handler per il click sul pulsante di esportazione
+  const handleExport = () => {
+    if (!baseFilename.trim()) return;
+    //composizione finale con trim e estensione
+    const finalFilename = composeFilename(baseFilename, format);
+    onExport(format, finalFilename);
+  };
+
+  //early return deve stare DOPO tutti gli hook
+  if (!isOpen) return null;
 
 
   return (
