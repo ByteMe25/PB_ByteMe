@@ -1,119 +1,299 @@
-/* Inizializza EasyMDE, gestisce auto-save del testo (debounce + flush su unmount), 
- * espone getSelection(), insertText(), clearEditor(), e coordina il trigger addEntry per lo storico
-*/
+/* ViewModel principale dell'editor
+ *  - Crea e distrugge l'istanza EasyMDE (unica nel sistema — MarkdownEditor è View pura)
+ *  - Configura toolbar e comportamenti EasyMDE
+ *  - Implementa auto-save con debounce su localStorage
+ *  - Espone API pulite: getEditorText, getSelection, insertTextAtCursor, clearEditor
+ *  - Gestisce la vista side-by-side di default
+ *  - Riceve onEntryAdded tramite Dependency Injection per disaccoppiamento con History
+ */
 
-// src/features/editor/hooks/useEditor.ts
 import { useState, useEffect, useRef, useCallback } from 'react';
 import EasyMDE from 'easymde';
+import toast from 'react-hot-toast';
 import { useEditorMetaStore } from '../store/useEditorMetaStore';
 
 const CONTENT_KEY = 'secondbrain-editor-content';
 const DEBOUNCE_MS = 500;
 
 export interface UseEditorProps {
+  //callback iniettata da EditorPage per aggiungere voci allo Storico (Dependency Injection)
   onEntryAdded?: (entry: unknown) => void;
 }
 
+export interface UseEditorReturn {
+  //Ref da passare alla textarea in MarkdownEditor
+  textareaRef: React.RefObject<HTMLTextAreaElement | null>;
+  //True quando EasyMDE è montato e pronto
+  isReady: boolean;
+  //Restituisce tutto il testo dell'editor
+  getEditorText: () => string;
+  //Restituisce il testo attualmente selezionato ('' se nulla)
+  getSelection: () => string;
 
-export const useEditor = ({ onEntryAdded }: UseEditorProps = {}) => {
-  //useRef per mantenere istanza EasyMDE e timer debounce senza causare re-render (useState causerebbe re-render)
+  /** Inserisce testo generato dall'AI:
+   * - Se c'è selezione attiva: inserisce dopo la selezione
+   * - Se non c'è selezione: inserisce in fondo al documento
+   */
+  insertTextAtCursor: (text: string) => void;
+
+  //Svuota l'editor e rimuove il contenuto dal localStorage
+  clearEditor: () => void;
+  //Ripristina l'istanza al contenuto del localStorage (utile dopo cambio file)
+  reloadFromStorage: () => void;
+  //Callback per lo storico (passata via DI da EditorPage)
+  onEntryAdded?: (entry: unknown) => void;
+}
+
+export const useEditor = ({ onEntryAdded }: UseEditorProps = {}): UseEditorReturn => {
   const easyMdeRef = useRef<EasyMDE | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { markDirty, markSaved } = useEditorMetaStore();
   const [isReady, setIsReady] = useState(false);
 
-  const initialContent = typeof window !== 'undefined'
-    ? (localStorage.getItem(CONTENT_KEY) || '')
-    : '';
+  //legge dal localStorage solo al primo mount, non durante i re-render
+  const initialContent =
+    typeof window !== 'undefined' ? localStorage.getItem(CONTENT_KEY) ?? '' : '';
 
-//appena la pagina viene caricata, React esegue questo blocco:
+
+  //montaggio EasyMDE
   useEffect(() => {
-    if (!textareaRef.current || easyMdeRef.current) return; //protezione contro doppia inizializzazione (non crea 2 editor)
+    //non crea due istanze se il componente si monta due volte (StrictMode)
+    if (!textareaRef.current || easyMdeRef.current) return;
 
-    //legge dal localStorage per ripristinare il testo di "ieri" e monta EasyMDE sopra la textarea
     easyMdeRef.current = new EasyMDE({
       element: textareaRef.current,
       initialValue: initialContent,
       spellChecker: false,
+      sideBySideFullscreen: false,
+      autofocus: true,
+      inputStyle: 'contenteditable',
       status: ['autosave', 'lines', 'words', 'cursor'],
+      syncSideBySidePreviewScroll: false,
+
+      // CONFIGURAZIONE TOOLBAR
+      toolbar: [
+        'undo', 'redo', '|',
+        'bold', 'italic',
+        {
+          name: 'underline',
+          action: (editor) => {
+            const cm = editor.codemirror;
+            const selected = cm.getSelection();
+            cm.replaceSelection(`<u>${selected || 'testo'}</u>`);
+          },
+          className: 'fa fa-underline',
+          title: 'Sottolineato',
+        },
+        '|',
+        'heading-smaller', 'heading-bigger', '|',
+        'table',
+        {
+          name: 'horizontal-rule',
+          action: (editor) => {
+            const cm = editor.codemirror;
+            cm.replaceRange('\n\n---\n\n', cm.getCursor());
+            cm.focus();
+          },
+          className: 'fa fa-minus',
+          title: 'Linea orizzontale',
+        },
+        'link',
+        '|',
+        'unordered-list',
+        'ordered-list',
+        '|',
+
+        //copia, incolla, taglia
+        
+        {
+          name: 'copy',
+          action: (editor) => {
+            const txt = editor.codemirror.getSelection();
+            if (!txt) {
+              toast.error('Seleziona del testo prima di copiare.');
+              return;
+            }
+            navigator.clipboard
+              .writeText(txt)
+              .then(() => toast.success('Copiato negli appunti!'));
+          },
+          className: 'fa fa-copy',
+          title: 'Copia (Ctrl+C)',
+        },
+        {
+          name: 'paste',
+          action: (editor) => {
+            navigator.clipboard
+              .readText()
+              .then((t) => {
+                editor.codemirror.replaceSelection(t);
+                toast.success('Testo incollato!');
+              })
+              .catch(() => toast.error('Usa Ctrl+V per incollare.'));
+          },
+          className: 'fa fa-paste',
+          title: 'Incolla (Ctrl+V)',
+        },
+        {
+          name: 'cut',
+          action: (editor) => {
+            const cm = editor.codemirror;
+            const txt = cm.getSelection();
+            if (!txt) {
+              toast.error('Seleziona del testo prima di tagliare.');
+              return;
+            }
+            navigator.clipboard.writeText(txt).then(() => {
+              cm.replaceSelection('');
+              toast.success('Testo tagliato!');
+            });
+          },
+          className: 'fa fa-scissors',
+          title: 'Taglia (Ctrl+X)',
+        },
+        '|',
+
+        //modalità di visualizzazione
+        {
+          name: 'editor-only',
+          action: (editor) => {
+            if (editor.isPreviewActive()) EasyMDE.togglePreview(editor);
+            if (editor.isSideBySideActive()) EasyMDE.toggleSideBySide(editor);
+          },
+          className: 'fa fa-pen',
+          title: 'Solo Editor',
+        },
+        {
+          name: 'preview-only',
+          action: (editor) => {
+            if (editor.isSideBySideActive()) EasyMDE.toggleSideBySide(editor);
+            if (!editor.isPreviewActive()) EasyMDE.togglePreview(editor);
+          },
+          className: 'fa fa-eye',
+          title: 'Solo Anteprima',
+        },
+        {
+          name: 'side-by-side',
+          action: (editor) => {
+            if (editor.isPreviewActive()) EasyMDE.togglePreview(editor);
+            if (!editor.isSideBySideActive()) EasyMDE.toggleSideBySide(editor);
+          },
+          className: 'fa fa-columns',
+          title: 'Modalità Affiancata',
+        },
+      ],
     });
 
-/* CodeMirror non ha un evento "change" nativo, quindi usiamo on('change') di EasyMDE: intercetta modifiche e implementa debounce + auto-save
- * l'hook distrugge il timer precedente (clearTimeout) e ne crea uno nuovo di 500 millisecondi:
- * solo quando l'utente si ferma per mezzo secondo, il testo viene salvato su localStorage e markSaved() viene chiamato
-*/
+    //vista di default: side-by-side
+    //setTimeout necessario perché EasyMDE ha bisogno di un tick per inizializzarsi
+    const sideBySideTimer = setTimeout(() => {
+      if (easyMdeRef.current && !easyMdeRef.current.isSideBySideActive()) {
+        EasyMDE.toggleSideBySide(easyMdeRef.current);
+      }
+    }, 100);
+
+
+    //AUTO SAVE CON DEBOUNCE
     const cm = easyMdeRef.current.codemirror;
+
     const handleChange = () => {
-      const text = easyMdeRef.current?.value() || '';
-      markDirty(); //ci sono modifiche non salvate
+      const text = easyMdeRef.current?.value() ?? '';
+      markDirty(); //segnala modifiche non salvate al Model
 
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
       saveTimerRef.current = setTimeout(() => {
         try {
           localStorage.setItem(CONTENT_KEY, text);
-          markSaved(); //modifiche salvate
-        } catch (e) { console.error('❌ Auto-save fallito:', e); }
+          markSaved();
+        } catch (e) {
+          console.error('❌ Auto-save fallito:', e);
+        }
       }, DEBOUNCE_MS);
     };
 
     cm.on('change', handleChange);
     setIsReady(true);
 
-    /* quando si cambia pagina React distrugge la pagina dell'editor ma questo blocco fa Flush Save:
-    * salva immediatamente l'ultimo millisecondo di testo scritto (senza aspettare il debounce) e pulisce l'istanza di EasyMDE
-    */
+
+    //cleanup: flush immediato + distruzione istanza
     return () => {
+      clearTimeout(sideBySideTimer);
       cm.off('change', handleChange);
+
+      //salva l'ultimo testo senza aspettare il debounce
       try {
-        const finalText = easyMdeRef.current?.value() || '';
+        const finalText = easyMdeRef.current?.value() ?? '';
+        if (saveTimerRef.current) {
+          clearTimeout(saveTimerRef.current);
+          saveTimerRef.current = null;
+        }
         localStorage.setItem(CONTENT_KEY, finalText);
         markSaved();
-      } catch (e) { console.error('❌ Flush save fallito:', e); }
+      } catch (e) {
+        console.error('❌ Flush save fallito:', e);
+      }
 
-      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
       easyMdeRef.current?.toTextArea();
       easyMdeRef.current = null;
+      setIsReady(false);
     };
   }, []);
 
 
-//API esposte: usano useCallback per essere memorizzate e non venire ricreate inutilmente a ogni render
-  const getEditorText = useCallback(() => easyMdeRef.current?.value() || '', []);
-  const getSelection = useCallback(() => easyMdeRef.current?.codemirror.getSelection() || '', []);
+  // API pubbliche - useCallback per stabilità referenziale (evita re-render)
+  const getEditorText = useCallback((): string => {
+    return easyMdeRef.current?.value() ?? '';
+  }, []);
 
-  const insertTextAtCursor = useCallback((text: string) => {
-    const cm = easyMdeRef.current?.codemirror;
-    if (!cm) return;
-
-    const currentSelection = cm.getSelection();
-
-    if (currentSelection) {
-      //c'è una selezione: mantiene il testo originale e aggiunge l'AI sotto
-      cm.replaceSelection(currentSelection + '\n\n' + text);
-    } else {
-      //nessuna selezione: va alla fine del documento
-      const lastLine = cm.lastLine();
-      const lastChar = cm.getLine(lastLine).length;
-      
-      //sposta il cursore alla fine fisica del file
-      cm.setCursor({ line: lastLine, ch: lastChar });
-      
-      //se il documento non è vuoto, aggiunge due ritorni a capo per staccare il testo
-      const prefix = cm.getValue().trim() === '' ? '' : '\n\n';
-      cm.replaceSelection(prefix + text);
-    }
-    
-    markDirty();
-  }, [markDirty]);
+  const getSelection = useCallback((): string => {
+    return easyMdeRef.current?.codemirror.getSelection() ?? '';
+  }, []);
 
 
-  const clearEditor = useCallback(() => {
-    if (easyMdeRef.current) {
-      easyMdeRef.current.value('');
-      localStorage.removeItem(CONTENT_KEY);
-      markSaved();
-    }
+  //inserisce testo generato dall'AI dopo la selezione, o in fondo se non c'è selezione
+  const insertTextAtCursor = useCallback(
+    (text: string): void => {
+      const cm = easyMdeRef.current?.codemirror;
+      if (!cm) return;
+
+      const currentSelection = cm.getSelection();
+
+      if (currentSelection) {
+        //mantiene la selezione originale + inserisce la generazione AI dopo
+        cm.replaceSelection(currentSelection + '\n\n' + text);
+      } else {
+        // Vai alla fine del documento
+        const lastLine = cm.lastLine();
+        const lastChar = cm.getLine(lastLine).length;
+        cm.setCursor({ line: lastLine, ch: lastChar });
+
+        //se il documento non è vuoto, aggiunge spaziatura
+        const prefix = cm.getValue().trim() === '' ? '' : '\n\n';
+        cm.replaceSelection(prefix + text);
+      }
+
+      markDirty();
+    },
+    [markDirty]
+  );
+
+
+  //svuota editor e localStorage (X della Topbar)
+  const clearEditor = useCallback((): void => {
+    if (!easyMdeRef.current) return;
+    easyMdeRef.current.value('');
+    localStorage.removeItem(CONTENT_KEY);
+    markSaved();
+  }, [markSaved]);
+
+  
+  //ricarica il contenuto dal localStorage nell'editor
+  const reloadFromStorage = useCallback((): void => {
+    if (!easyMdeRef.current) return;
+    const saved = localStorage.getItem(CONTENT_KEY) ?? '';
+    easyMdeRef.current.value(saved);
+    markSaved();
   }, [markSaved]);
 
   return {
@@ -123,12 +303,7 @@ export const useEditor = ({ onEntryAdded }: UseEditorProps = {}) => {
     getSelection,
     insertTextAtCursor,
     clearEditor,
-    onEntryAdded, //fondamentale per Dependency Injection con History *
+    reloadFromStorage,
+    onEntryAdded,
   };
 };
-
-/*
- *Restituendo la prop onEntryAdded alla fine, permetti all'hook di fare da tramite tra AI Panel e lo Storico, per aggiornarlo.
- * Editor e Storico sono disaccoppiati, ma grazie a onEntryAdded l'Editor può notificare lo Storico quando viene 
- * aggiunta una nuova voce (entry) senza conoscere i dettagli dello Storico,
-*/

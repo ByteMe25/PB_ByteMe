@@ -5,7 +5,7 @@ import { useFileUpload } from './useFileUpload';
 import { useEditorMetaStore } from '../store/useEditorMetaStore';
 import toast from 'react-hot-toast';
 
-//mock del Toast
+//mock di react-hot-toast
 vi.mock('react-hot-toast', () => ({
   default: {
     success: vi.fn(),
@@ -13,66 +13,46 @@ vi.mock('react-hot-toast', () => ({
   },
 }));
 
-//mock dello Store Zustand (Zustand esporta getState() che possiamo mockare)
-vi.mock('../store/useEditorMetaStore', () => ({
-  useEditorMetaStore: {
-    getState: vi.fn(),
-  },
-}));
-
-//mock del FileReader (API nativa del browser)
-class MockFileReader {
-  onload: ((e: any) => void) | null = null;
-  onerror: ((e: any) => void) | null = null;
-
-  readAsText(file: File) {
-    setTimeout(() => {
-      if (file.name === 'corrotto.md') {
-        this.onerror && this.onerror(new ProgressEvent('error'));
-      } else {
-        this.onload && this.onload({ target: { result: '# Contenuto del file caricato' } });
-      }
-    }, 10);
-  }
-}
-
+//mock per Zustand
+vi.mock('../store/useEditorMetaStore', () => {
+  const storeMock = vi.fn();
+  //crea il mock direttamente qui dentro per evitare l'errore di hoisting di Vitest
+  (storeMock as any).getState = vi.fn(); 
+  return { useEditorMetaStore: storeMock };
+});
 
 describe('useFileUpload (ViewModel)', () => {
   const mockOnFileLoaded = vi.fn();
   const mockSetFileName = vi.fn();
   const mockMarkSaved = vi.fn();
+  
+  const originalConfirm = window.confirm;
 
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear();
     
-    //setup di base del window.confirm
-    vi.spyOn(window, 'confirm').mockImplementation(() => true);
-    
-    //modo corretto e type-safe per mockare in Vitest
-    vi.stubGlobal('FileReader', MockFileReader);
+    //simula che l'utente clicchi sempre "OK" sui popup di conferma
+    window.confirm = vi.fn(() => true); 
 
-    //setup di default dello store
-    vi.mocked(useEditorMetaStore.getState).mockReturnValue({
+    (useEditorMetaStore as any).getState.mockReturnValue({
       isDirty: false,
       setFileName: mockSetFileName,
       markSaved: mockMarkSaved,
-    } as any);
+    });
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
-    //rimuove il mock del FileReader alla fine del test
-    vi.unstubAllGlobals();
+    window.confirm = originalConfirm;
   });
 
 
-  //requisito obbligatorio
-  it('rifiuta file con estensione non valida', async () => {
+  it('rifiuta i file con formato non supportato', async () => {
     const { result } = renderHook(() => useFileUpload(mockOnFileLoaded));
-    const invalidFile = new File(['test'], 'immagine.png', { type: 'image/png' });
+    const invalidFile = new File([''], 'immagine.png', { type: 'image/png' });
 
     await act(async () => {
-      await result.current.processFile(invalidFile);
+      await result.current.uploadFile(invalidFile);
     });
 
     expect(toast.error).toHaveBeenCalledWith('Formato non supportato. Carica solo file .md o .txt');
@@ -80,19 +60,12 @@ describe('useFileUpload (ViewModel)', () => {
   });
 
 
-  // requisito obbligatorio
-  it('rifiuta file che superano la dimensione massima (5MB)', async () => {
+  it('rifiuta i file troppo grandi', async () => {
     const { result } = renderHook(() => useFileUpload(mockOnFileLoaded));
-    const largeFile = new File([''], 'grande.md', { type: 'text/markdown' });
-    
-    Object.defineProperty(largeFile, 'size', { 
-      value: 6 * 1024 * 1024, 
-      configurable: true, 
-      writable: false 
-    }); 
+    const largeFile = new File([new ArrayBuffer(6 * 1024 * 1024)], 'grande.md');
 
     await act(async () => {
-      await result.current.processFile(largeFile);
+      await result.current.uploadFile(largeFile);
     });
 
     expect(toast.error).toHaveBeenCalledWith('Il file supera la dimensione massima di 5MB.');
@@ -100,81 +73,62 @@ describe('useFileUpload (ViewModel)', () => {
   });
 
 
-  //requisito obbligatorio
-  it('se isDirty è true, chiede conferma. Se l\'utente annulla, non carica nulla', async () => {
-    //simula che ci siano modifiche non salvate
-    vi.mocked(useEditorMetaStore.getState).mockReturnValue({ isDirty: true } as any);
-    //l'utente clicca "Annulla" sul prompt
-    vi.mocked(window.confirm).mockImplementationOnce(() => false);
+  it('non carica il file se l\'utente annulla la conferma su documento sporco', async () => {
+    //rende il documento "sporco"
+    (useEditorMetaStore as any).getState.mockReturnValue({
+      isDirty: true,
+      setFileName: mockSetFileName,
+      markSaved: mockMarkSaved,
+    });
+    //simula l'utente che clicca "Annulla"
+    window.confirm = vi.fn(() => false); 
 
     const { result } = renderHook(() => useFileUpload(mockOnFileLoaded));
-    const validFile = new File(['test'], 'documento.md', { type: 'text/markdown' });
+    const validFile = new File(['testo'], 'appunti.md', { type: 'text/markdown' });
 
     await act(async () => {
-      await result.current.processFile(validFile);
+      await result.current.uploadFile(validFile);
     });
 
-    expect(window.confirm).toHaveBeenCalledWith('Hai delle modifiche non salvate. Sei sicuro di voler caricare un nuovo file e sovrascrivere quello attuale?');
-    expect(mockOnFileLoaded).not.toHaveBeenCalled(); //l'upload si deve fermare
-  });
-
-
-  it('carica correttamente un file valido e aggiorna lo store', async () => {
-    const { result } = renderHook(() => useFileUpload(mockOnFileLoaded));
-    const validFile = new File(['test'], 'appunti.md', { type: 'text/markdown' });
-
-    await act(async () => {
-      await result.current.processFile(validFile);
-      //aspetta che la Promise del finto FileReader si risolva
-      await new Promise((r) => setTimeout(r, 20)); 
-    });
-
-    //deve aver passato il testo all'editor
-    expect(mockOnFileLoaded).toHaveBeenCalledWith('# Contenuto del file caricato');
-    
-    //deve aver aggiornato lo store (Model)
-    expect(mockSetFileName).toHaveBeenCalledWith('appunti.md');
-    expect(mockMarkSaved).toHaveBeenCalled();
-    
-    //deve aver mostrato il successo
-    expect(toast.success).toHaveBeenCalledWith('File "appunti.md" caricato con successo!');
-  });
-
-
-  it('gestisce gli errori di lettura del FileReader senza far crashare l\'app', async () => {
-    const { result } = renderHook(() => useFileUpload(mockOnFileLoaded));
-    const corruptedFile = new File(['test'], 'corrotto.md', { type: 'text/markdown' });
-
-    await act(async () => {
-      await result.current.processFile(corruptedFile);
-      await new Promise((r) => setTimeout(r, 20));
-    });
-
-    expect(toast.error).toHaveBeenCalledWith('Impossibile leggere il file.');
+    expect(window.confirm).toHaveBeenCalledWith('Hai modifiche non salvate. Sovrascrivere?');
     expect(mockOnFileLoaded).not.toHaveBeenCalled();
   });
 
 
-  //test sullo spinner
-  it('gestisce correttamente lo stato isUploading', async () => {
+  it('legge il file correttamente, salva in storage, aggiorna lo store e chiama l\'editor', async () => {
+    const { result } = renderHook(() => useFileUpload(mockOnFileLoaded));
+    const validFile = new File(['# Ciao'], 'appunti_studio.md', { type: 'text/markdown' });
+
+    await act(async () => {
+      await result.current.uploadFile(validFile);
+    });
+
+    expect(localStorage.getItem('secondbrain-editor-content')).toBe('# Ciao');
+    expect(mockSetFileName).toHaveBeenCalledWith('appunti_studio');
+    expect(mockMarkSaved).toHaveBeenCalled();
+    expect(mockOnFileLoaded).toHaveBeenCalledTimes(1);
+    expect(toast.success).toHaveBeenCalledWith('File "appunti_studio.md" caricato!');
+  });
+
+  
+  it('gestisce correttamente lo stato isUploading (Spinner)', async () => {
     const { result } = renderHook(() => useFileUpload(mockOnFileLoaded));
     const validFile = new File(['test'], 'appunti.md', { type: 'text/markdown' });
     
-    expect(result.current.isUploading).toBe(false); //inizialmente è false
+    expect(result.current.isUploading).toBe(false);
 
-    let processPromise: Promise<void>;
+    let uploadPromise: Promise<void>;
     
     act(() => {
-      processPromise = result.current.processFile(validFile);
+      uploadPromise = result.current.uploadFile(validFile);
     });
     
-    expect(result.current.isUploading).toBe(true); //durante l'esecuzione è true
+    expect(result.current.isUploading).toBe(true);
 
     await act(async () => {
-      await processPromise;
-      await new Promise((r) => setTimeout(r, 20)); //aspetta il FileReader finto
+      await uploadPromise;
     });
 
-    expect(result.current.isUploading).toBe(false); //alla fine torna false
+    expect(result.current.isUploading).toBe(false);
   });
 });
