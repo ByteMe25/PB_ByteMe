@@ -1,13 +1,15 @@
-/* stile per l'editor, configurazione easyMDE*/
+/* stile per l'editor, configurazione easyMDE + stile toolbar */
 .editorWrapper {
-  width: 100%;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  border-radius: 0.75em;
+  border-radius: 0.6em;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   background: #ffffff;
   overflow: hidden;
+  position: relative;
 }
 
 /* =========================================
@@ -17,16 +19,27 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  border: none; /* Rimuove il bordo default della libreria */
+  border: none; /* rimuove il bordo default della libreria */
 }
 
 /* Toolbar */
 .editorWrapper :global(.editor-toolbar) {
-  background-color: var(--bg-header, #f8fafc);
+  flex-shrink: 0;
+  background-color: var(--bg-header);
   border: none;
-  border-bottom: 1px solid rgba(0,0,0,0.08);
+  border-bottom: 0.0625em solid rgba(0,0,0,0.08);
   padding: 0.5em;
-  opacity: 1;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap; /* impedisce di andare a capo */
+  overflow-x: auto; /* scroll orizzontale se lo schermo è piccolo */
+  overflow-y: hidden;
+  scrollbar-width: none; /* nasconde la scrollbar su Firefox */
+}
+
+/* nasconde scrollbar su Chrome/Safari per la toolbar */
+.editorWrapper :global(.editor-toolbar::-webkit-scrollbar) {
+  display: none;
 }
 
 .editorWrapper :global(.editor-toolbar button) {
@@ -44,9 +57,13 @@
   color: var(--col-accent);
 }
 
-/* nasconde separatori vecchi di EasyMDE */
-.editorWrapper :global(.editor-toolbar i.separator) {
-  display: none; 
+/* fix scroll split view */
+.editorWrapper :global(.EasyMDEContainer) {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: none;
+  min-height: 0;
 }
 
 /* Area di Testo (CodeMirror) */
@@ -64,19 +81,46 @@
 /* Scroll interno per CodeMirror */
 .editorWrapper :global(.CodeMirror-scroll) {
   height: 100%;
-  min-height: 100%;
+  min-height: 0;
+  overflow-y: auto !important;
+  overflow-x: auto !important;
 }
 
-/* Vista side-by-side */
+
+/* =========================================
+   SPLIT VIEW E SCROLL (Approccio identico al POC)
+   ========================================= */
 .editorWrapper :global(.EasyMDEContainer.sided--no-fullscreen) {
   display: flex;
   flex-direction: row;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
 }
 
+/* editor prende il 50% dello spazio (flex: 1) */
+.editorWrapper :global(.EasyMDEContainer.sided--no-fullscreen .CodeMirror) {
+  flex: 1 !important; 
+  max-width: none !important;
+  min-width: 0;
+  height: 100%;
+}
+
+/* anteprima prende l'altro 50% dello spazio (flex: 1) */
 .editorWrapper :global(.editor-preview-side) {
-  flex: 1;
-  border-left: 1px solid rgba(0,0,0,0.08);
+  flex: 1 !important; 
+  max-width: none !important;
+  position: static !important; /* disinnesca JS EasyMDE come nel POC */
+  
+  /* per scroll interno */
+  height: 100% !important; 
+  min-height: 0 !important; 
+  overflow-y: auto !important; 
+  overflow-x: hidden !important;
+
+  border-left: 0.0625em solid rgba(0,0,0,0.08);
   padding: 1.5em;
   color: var(--text-main);
-  background-color: var(--bg-editor);
+  background-color: var(--bg-view);
 }

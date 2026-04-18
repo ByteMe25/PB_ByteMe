@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
 import { HistoryPage } from './HistoryPage';
 import { useHistory } from '../hooks/useHistory';
 
@@ -41,7 +42,11 @@ beforeEach(() => {
 
 
 test('passa il testo di ricerca al ViewModel quando l\'utente scrive', () => {
-  render(<HistoryPage />);
+  render(
+    <MemoryRouter>
+      <HistoryPage />
+    </MemoryRouter>
+  );
   
   const searchInput = screen.getByPlaceholderText(/cerca/i);
   fireEvent.change(searchInput, { target: { value: 'Bread' } });
@@ -54,7 +59,11 @@ test('passa il testo di ricerca al ViewModel quando l\'utente scrive', () => {
 
 
 test('passa l\'operazione al ViewModel quando l\'utente usa la select', () => {
-  render(<HistoryPage />);
+  render(
+    <MemoryRouter>
+      <HistoryPage />
+    </MemoryRouter>
+  );
 
   const select = screen.getByRole('combobox');
   fireEvent.change(select, { target: { value: 'summary' } });
@@ -75,7 +84,11 @@ test('mostra il messaggio di caricamento se l\'hook è in loading', () => {
     deleteEntry: vi.fn(),
   });
 
-  render(<HistoryPage />);
+  render(
+    <MemoryRouter>
+      <HistoryPage />
+    </MemoryRouter>
+  );
   expect(screen.getByRole('status')).toBeInTheDocument();
 });
 
@@ -89,7 +102,11 @@ test('chiama deleteEntry quando viene eliminata una card', () => {
     deleteEntry: mockDelete,
   });
 
-  render(<HistoryPage />);
+  render(
+    <MemoryRouter>
+      <HistoryPage />
+    </MemoryRouter>
+  );
   
   const deleteBtn = screen.getByText(/elimina/i);
   fireEvent.click(deleteBtn);

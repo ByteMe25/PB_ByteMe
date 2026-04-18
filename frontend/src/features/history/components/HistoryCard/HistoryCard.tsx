@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import type { HistoryEntry } from '../../types/HistoryEntry';
 
+import styles from './HistoryCard.module.css';
+
 
 //Mappa per associare a ogni operazione un colore
 const OPERATION_COLORS: Record<string, string> = {

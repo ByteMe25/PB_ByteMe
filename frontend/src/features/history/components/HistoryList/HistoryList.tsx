@@ -2,6 +2,8 @@ import React from 'react';
 import type { HistoryEntry } from '../../types/HistoryEntry';
 import { HistoryCard } from '../HistoryCard/HistoryCard';
 
+import styles from './HistoryList.module.css';
+
 
 interface HistoryListProps {
   items: HistoryEntry[];

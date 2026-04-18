@@ -28,12 +28,12 @@ vi.mock('../../../components/Topbar/Topbar', () => ({
 }));
 
 vi.mock('../../../components/Sidebar/Sidebar', () => ({
-  Sidebar: ({ onUpload, onSave, onPrint, onAiPanelOpen }: any) => (
+  Sidebar: ({ onUpload, onSave, onPrint, onAiAction }: any) => (
     <div data-testid="mock-sidebar">
       <button data-testid="sidebar-upload" onClick={onUpload}>Upload</button>
       <button data-testid="sidebar-save" onClick={onSave}>Save</button>
       <button data-testid="sidebar-print" onClick={onPrint}>Print</button>
-      <button data-testid="sidebar-ai" onClick={onAiPanelOpen}>AI Panel</button>
+      <button data-testid="sidebar-ai" onClick={onAiAction}>AI Panel</button>
     </div>
   )
 }));
@@ -97,9 +97,7 @@ describe('EditorPage (Orchestratore)', () => {
     vi.mocked(useFileUpload).mockReturnValue({
       isUploading: false,
       openFilePicker: mockOpenFilePicker,
-      uploadFile: mockUploadFile,
-      inputRef: { current: null } as any,
-      handleFileInput: vi.fn(),
+      uploadFile: mockUploadFile
     });
 
     vi.mocked(usePrintDocument).mockReturnValue({
@@ -114,7 +112,7 @@ describe('EditorPage (Orchestratore)', () => {
       markDirty: vi.fn()
     });
 
-    vi.mocked(useHistoryStore).mockReturnValue(vi.fn());
+    vi.mocked(useHistoryStore).mockReturnValue(vi.fn() as any);
     
     //evita che window.confirm blocchi i test
     window.confirm = vi.fn(() => true);
@@ -160,7 +158,7 @@ describe('EditorPage (Orchestratore)', () => {
     expect(mockUploadFile).toHaveBeenCalledTimes(1);
   });
 
-  /* DA FARE DOPO AVER IMPLEMENTATO PANNELLO AI
+
   it('mostra e nasconde il pannello AI cliccando il bottone nella Sidebar', () => {
     render(<MemoryRouter><EditorPage /></MemoryRouter>);
     
@@ -175,7 +173,7 @@ describe('EditorPage (Orchestratore)', () => {
     fireEvent.click(screen.getByText('✕'));
     expect(screen.queryByText('Pannello AI — in sviluppo')).not.toBeInTheDocument();
   });
-  */
+
 
   it('passa correttamente il contenuto dell\'editor quando si esporta dal modale', () => {
     //forza il mock di useSaveDocument per dire che il modale è APERTO

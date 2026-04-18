@@ -41,9 +41,9 @@ export const EditorPage = () => {
 
   //VIEWMODEL: salvataggio documento
   const { isOpen: isSaveModalOpen, openModal: openSaveModal, closeModal: closeSaveModal, handleExport, isExporting } = useSaveDocument();
-  
+
   // VIEWMODEL: caricamento file
-  const { openFilePicker, uploadFile, isUploading, inputRef, handleFileInput } = useFileUpload(editor.reloadFromStorage);
+  const { openFilePicker, uploadFile } = useFileUpload(editor.reloadFromStorage);
   //VIEWMODEL: stampa
   const { handlePrint } = usePrintDocument(editor.getEditorText);
 

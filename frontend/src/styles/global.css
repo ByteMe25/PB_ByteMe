@@ -1,4 +1,8 @@
 /* Reset e variabili CSS: stile globale */
+
+/* import font*/
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+
 :root {
   /* =========================================
     VARIABILI GLOBALI - PALET DI COLORI
@@ -55,30 +59,28 @@ body {
   /*margini fisici del foglio */
   @page { margin: 1.5cm; }
 
-  /*nasconde UI dell'app */
-  .sidebar, .topbar { 
+  /* nasconde la UI aggirando l'hash dei CSS Modules - per stampa lascia solo il testo */
+  [class*="Sidebar_sidebar"], 
+  [class*="Topbar_topbar"], 
+  [class*="EditorPage_aiPanel"] { 
     display: none !important; 
   }
 
-  /*nasconde UI EasyMDE */
   .editor-toolbar, 
-  .editor-statusbar {
-    display: none !important;
-  }
-
-  /*nasconde area scrittura (codice sorgente) */
+  .editor-statusbar,
   .CodeMirror {
     display: none !important;
   }
 
-  /*mostra e adatta l'anteprima formattata */
-  .editor-preview {
+  .editor-preview,
+  .editor-preview-side {
     display: block !important;
     width: 100% !important;
     border: none !important;
     padding: 0 !important;
     overflow: visible !important;
     background: transparent !important;
+    box-shadow: none !important;
   }
 
   /* evita spezzamenti indesiderati tra pagine */
