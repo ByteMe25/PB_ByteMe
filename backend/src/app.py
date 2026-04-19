@@ -19,10 +19,15 @@ def generate_ai_text():
     """
     data = request.json
     text = data.get('text', '')
+    prompt = data.get('prompt', '')
     operation = data.get('operation', DEFAULT_OPERATION)
 
-    if not text:
-        return jsonify({"generated_text": "❌ Nessun testo fornito."}), 400
+    if operation == 'distant_writing':
+        if not prompt:
+            return jsonify({"generated_text": "❌ Nessun prompt fornito."}), 400
+    else:
+        if not text:
+            return jsonify({"generated_text": "❌ Nessun testo fornito."}), 400
 
     # Recupera la configurazione (modello + prompt) dal Registry
     config = OPERATION_REGISTRY.get(operation) or OPERATION_REGISTRY[DEFAULT_OPERATION]
@@ -30,7 +35,7 @@ def generate_ai_text():
     try:
         # Ottiene l'istanza del modello e costruisce i prompt
         model = get_model(config.model_class)
-        system_prompt, user_prompt = config.prompt_strategy.build(text)
+        system_prompt, user_prompt = config.prompt_strategy.build(text, prompt)
         
         # Recupera la temperatura specifica della strategia (es. 0.8 per il Cappello Verde)
         temp = config.prompt_strategy.temperature

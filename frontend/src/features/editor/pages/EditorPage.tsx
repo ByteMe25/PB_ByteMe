@@ -24,6 +24,7 @@ import { AiPanel } from '../components/AiPanel/AiPanel';
 
 import styles from './EditorPage.module.css';
 import type { ExportFormat } from '../types';
+import { AiWidget } from '../components/AiWidget/AiWidget';
 
 
 export const EditorPage = () => {
@@ -93,6 +94,8 @@ export const EditorPage = () => {
             textareaRef={editor.textareaRef}
             onFileDrop={uploadFile}
           />
+
+          <AiWidget />
 
           {isAiPanelOpen && (
             <aside className={styles.aiPanel_wrap}>

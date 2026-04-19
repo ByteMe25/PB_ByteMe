@@ -18,3 +18,23 @@
     border-radius: .75em;
     box-sizing: border-box;
 }
+
+.button_wrapper {
+  position: relative;
+}
+
+.button_wrapper[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 8px;
+  background: #1a1a1a;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  pointer-events: none;
+}
