@@ -124,3 +124,121 @@
   color: var(--text-main);
   background-color: var(--bg-view);
 }
+
+
+/* =========================================
+   TIPOGRAFIA E SPAZIATURE (Aanteprima formatta del testo)
+   ripristina i margini rimossi dal reset globale
+   ========================================= */
+/* spazio dei paragrafi */
+.editorWrapper :global(.editor-preview p),
+.editorWrapper :global(.editor-preview-side p),
+.editorWrapper :global(.editor-preview ul),
+.editorWrapper :global(.editor-preview-side ul),
+.editorWrapper :global(.editor-preview ol),
+.editorWrapper :global(.editor-preview-side ol) {
+  margin-bottom: 1em;
+  line-height: 1.6;
+}
+
+/* titoli e intestazioni */
+.editorWrapper :global(.editor-preview h1),
+.editorWrapper :global(.editor-preview-side h1),
+.editorWrapper :global(.editor-preview h2),
+.editorWrapper :global(.editor-preview-side h2),
+.editorWrapper :global(.editor-preview h3),
+.editorWrapper :global(.editor-preview-side h3),
+.editorWrapper :global(.editor-preview h4),
+.editorWrapper :global(.editor-preview-side h4) {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  color: var(--col-primary);
+}
+
+/* separatore orizzontale (---) */
+.editorWrapper :global(.editor-preview hr),
+.editorWrapper :global(.editor-preview-side hr) {
+  margin: 2em 0;
+  border: none;
+  border-top: 0.125em solid var(--border-light);
+}
+
+/* voci di lista */
+.editorWrapper :global(.editor-preview li),
+.editorWrapper :global(.editor-preview-side li) {
+  margin-bottom: 0.5em;
+}
+
+/* tabelle */
+.editorWrapper :global(.editor-preview table),
+.editorWrapper :global(.editor-preview-side table) {
+  width: 100%;
+  border-collapse: collapse; /* Unisce i bordi doppi in un bordo singolo e pulito */
+  margin-bottom: 1.5em;
+}
+
+/* celle e intestazioni */
+.editorWrapper :global(.editor-preview th),
+.editorWrapper :global(.editor-preview-side th),
+.editorWrapper :global(.editor-preview td),
+.editorWrapper :global(.editor-preview-side td) {
+  /* Usiamo var(--text-main) come hai suggerito per i bordi! */
+  border: 0.0625em solid var(--text-main); 
+  padding: 0.75em 1em; /* Diamo spazio al testo dentro le celle */
+  text-align: left;
+}
+
+.editorWrapper :global(.editor-preview th),
+.editorWrapper :global(.editor-preview-side th) {
+  background-color: rgba(8, 2, 44, 0.05); /* Grigio leggerissimo per staccarla dal corpo */
+  font-weight: 700;
+  color: var(--col-primary); /* Testo dell'intestazione col tuo colore primario */
+}
+
+
+/* ==================
+   STAMPA EDITOR 
+   ================= */
+@media print {
+  .editorWrapper {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .editorWrapper :global(.editor-toolbar) {
+    display: none !important;
+  }
+
+  .editorWrapper :global(.CodeMirror) {
+    display: none !important;
+  }
+
+  .editorWrapper :global(.editor-preview),
+  .editorWrapper :global(.editor-preview-side) {
+    display: block !important;
+    position: relative !important;
+    height: auto !important;
+    width: 100% !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+  }
+}
+
+/* tabelle */
+  .editorWrapper :global(.editor-preview table),
+  .editorWrapper :global(.editor-preview-side table) {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    margin-bottom: 1.5em !important;
+  }
+
+  .editorWrapper :global(.editor-preview th),
+  .editorWrapper :global(.editor-preview-side th),
+  .editorWrapper :global(.editor-preview td),
+  .editorWrapper :global(.editor-preview-side td) {
+    border: 1px solid black !important;
+    padding: 0.5em 1em !important;
+    color: black !important;
+  }

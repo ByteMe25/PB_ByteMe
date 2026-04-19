@@ -21,7 +21,14 @@ export const sanitizeFilename = (name: string): string => {
  * @returns Il filename completo e valido (es. 'mio-file.md')
  */
 export const composeFilename = (baseName: string, extension: string): string => {
-  const clean = sanitizeFilename(baseName).trim(); //trim finale
+  let clean = sanitizeFilename(baseName).trim(); // trim finale
   const ext = extension.startsWith('.') ? extension.slice(1) : extension;
+
+  //rimuove l'estensione se l'utente l'ha digitata, ignora le maiuscole/minuscole ('i').
+  const extRegex = new RegExp(`\\.${ext}$`, 'i');
+  clean = clean.replace(extRegex, '');
+
+  clean = clean.replace(/\.(md|txt|html)$/i, '');
+
   return clean ? `${clean}.${ext}` : `documento.${ext}`;
 };

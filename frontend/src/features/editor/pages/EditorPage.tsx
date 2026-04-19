@@ -63,23 +63,27 @@ export const EditorPage = () => {
 
   return (
     <div className={styles.layout}>
-      {/* TOPBAR: nome documento + pulsante chiudi */}
-      <Topbar
-        documentName={fileName}
-        onDocumentNameChange={setFileName}
-        onCloseDocument={handleCloseDocument}
-      />
+      <div className="no-print">
+        {/* TOPBAR: nome documento + pulsante chiudi */}
+        <Topbar
+          documentName={fileName}
+          onDocumentNameChange={setFileName}
+          onCloseDocument={handleCloseDocument}
+        />
+      </div>
 
       <div className={styles.body}>
-        {/* SIDEBAR: navigazione + azioni file + AI */}
-        <Sidebar
-          activePage="editor"
-          onNavigate={(p) => p === 'history' && navigate('/storico')}
-          onUpload={openFilePicker}
-          onSave={openSaveModal}
-          onPrint={handlePrint}
-          onAiAction={() => setIsAiPanelOpen((prev) => !prev)}
-        />
+        <div className="no-print">
+          {/* SIDEBAR: navigazione + azioni file + AI */}
+          <Sidebar
+            activePage="editor"
+            onNavigate={(p) => p === 'history' && navigate('/storico')}
+            onUpload={openFilePicker}
+            onSave={openSaveModal}
+            onPrint={handlePrint}
+            onAiAction={() => setIsAiPanelOpen((prev) => !prev)}
+          />
+        </div>
 
         {/* AREA PRINCIPALE: editor + pannello AI (quando aperto) */}
         <main className={styles.main}>

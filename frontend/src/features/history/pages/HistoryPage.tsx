@@ -1,17 +1,21 @@
+/* Pagina dello Storico delle generazioni AI
+ *  - Mostra la lista delle generazioni con filtri (search, operation)
+ *  - Condivide Topbar e Sidebar con EditorPage per coerenza UI
+ *  - Delega la logica di filtraggio/ordinamento al ViewModel useHistory
+ */
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { HistoryList } from '../components/HistoryList/HistoryList';
+//viewModel
 import { useHistory } from '../hooks/useHistory';
-
-//componenti
+//model (solo lettura del fileName per la Topbar)
+import { useEditorMetaStore } from '../../editor/store/useEditorMetaStore';
+//componenti view
 import { Topbar } from '../../../components/Topbar/Topbar';
 import { Sidebar } from '../../../components/Sidebar/Sidebar';
-//store
-import { useEditorMetaStore } from '../../editor/store/useEditorMetaStore';
-
+import { HistoryList } from '../components/HistoryList/HistoryList';
+ 
 import styles from './HistoryPage.module.css';
-import editorLayoutStyles from '../../editor/pages/EditorPage.module.css';
-
 
 export const HistoryPage = () => {
   const navigate = useNavigate();
@@ -26,7 +30,7 @@ export const HistoryPage = () => {
   const { entries, isLoading, error, deleteEntry } = useHistory({ search, operation });
 
   return (
-    <div className={editorLayoutStyles.layout}>
+    <div className={styles.layout}>
       {/* TOPBAR */}
       <Topbar 
         documentName={fileName}
@@ -34,7 +38,7 @@ export const HistoryPage = () => {
         onCloseDocument={() => navigate('/')} 
       />
 
-      <div className={editorLayoutStyles.body}>
+      <div className={styles.body}>
         {/* SIDEBAR */}
         <Sidebar 
           activePage="history" 
@@ -48,7 +52,7 @@ export const HistoryPage = () => {
         />
 
         {/* main: contiene i filtri e la lista */}
-        <main className={styles.container}>
+        <main className={styles.main}>
           
           {/* wrapper dei filtri per mantenere l'impaginazione del CSS */}
           <div className={styles.filters}>
@@ -60,8 +64,12 @@ export const HistoryPage = () => {
               onChange={(e) => setSearch(e.target.value)}
             />
 
-            <select value={operation} onChange={e => setOperation(e.target.value)}>
-            <option value="">Tutte</option>
+          <select
+              className={styles.selectInput}
+              value={operation}
+              onChange={(e) => setOperation(e.target.value)}
+            >
+            <option value="">Tutte le operazioni</option>
             <option value="summary">Riassunto</option>
             <option value="fix_grammar">Correzione grammatica</option>
             <option value="rewrite">Riscrittura</option>
@@ -81,6 +89,7 @@ export const HistoryPage = () => {
           </select>
           </div>
 
+          {/* Lista generazioni — delega rendering a HistoryList */}
           <div className={styles.contentWrapper}>
             <HistoryList
               items={entries}

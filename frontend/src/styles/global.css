@@ -56,35 +56,33 @@ body {
    REGOLE DI STAMPA - per stampare solo foglio formattato in markdown
    ================================================================== */
 @media print {
-  /*margini fisici del foglio */
+  /* margini fisici del foglio */
   @page { margin: 1.5cm; }
 
-  /* nasconde la UI aggirando l'hash dei CSS Modules - per stampa lascia solo il testo */
-  [class*="Sidebar_sidebar"], 
-  [class*="Topbar_topbar"], 
-  [class*="EditorPage_aiPanel"] { 
-    display: none !important; 
-  }
-
-  .editor-toolbar, 
-  .editor-statusbar,
-  .CodeMirror {
+  /* nasconde sidebar e topbar */
+  #root .no-print, 
+  #root .no-print * {
     display: none !important;
   }
 
-  .editor-preview,
-  .editor-preview-side {
-    display: block !important;
-    width: 100% !important;
-    border: none !important;
-    padding: 0 !important;
-    overflow: visible !important;
-    background: transparent !important;
-    box-shadow: none !important;
+  /* disinnesca le restrizioni di altezza e scorrimento su tutto */
+  * {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important; /* Forza l'uscita del testo dai contenitori */
+    position: static !important;
   }
 
-  /* evita spezzamenti indesiderati tra pagine */
-  h1, h2, h3, h4, h5, h6, p, pre, blockquote, table, ul, ol, li {
+  /* annulla i limiti di altezza e scroll per permettere fogli multipli */
+  html, body, #root, main, article, [class*="layout"], [class*="body"], [class*="container"] {
+    display: block !important;
+    background-color: white !important;
+    color: black !important;
+  }
+
+  /* Evita spezzamenti orribili a metà pagina per elementi in blocco */
+  h1, h2, h3, h4, h5, h6, p, pre, blockquote, table, ul, ol, li, img {
     page-break-inside: avoid;
+    break-inside: avoid; /* Standard moderno */
   }
 }
