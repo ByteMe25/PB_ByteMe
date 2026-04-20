@@ -28,10 +28,7 @@ export const useSaveDocument = () => {
         const mimeTypeMap: Record<ExportFormat, string> = {
           md: 'text/markdown',
           txt: 'text/plain',
-          html: 'text/html',
-          pdf: 'application/pdf', //probabilmente darà file corrotto perchè non supportato nativamente 
-          docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', //da vedere
-          odt: 'application/vnd.oasis.opendocument.text', //da vedere
+          html: 'text/html'
         };
 
         //esegue il download fisico

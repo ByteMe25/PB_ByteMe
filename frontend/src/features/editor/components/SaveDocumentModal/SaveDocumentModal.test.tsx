@@ -59,11 +59,11 @@ describe('SaveDocumentModal', () => {
     render(<SaveDocumentModal {...defaultProps} />);
     
     fireEvent.change(screen.getByLabelText(/nome file/i), { target: { value: '  report finale  ' } });
-    fireEvent.change(screen.getByLabelText(/formato/i), { target: { value: 'pdf' } });
+    fireEvent.change(screen.getByLabelText(/formato/i), { target: { value: 'html' } });
     fireEvent.click(screen.getByRole('button', { name: /esporta/i }));
     
     //il trim() viene applicato qui, al momento dell'export
-    expect(mockOnExport).toHaveBeenCalledWith('pdf', 'report finale.pdf');
+    expect(mockOnExport).toHaveBeenCalledWith('html', 'report finale.html');
   });
 
   it('disabilita i controlli durante l\'esportazione (isExporting = true)', () => {
