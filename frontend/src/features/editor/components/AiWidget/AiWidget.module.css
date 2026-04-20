@@ -39,7 +39,7 @@ h3{
     min-height: 4.1em;
 }
 
-button{
+.ai_widget button{
     margin: 0 .5em;
     border-radius: .75em;
     border: none;

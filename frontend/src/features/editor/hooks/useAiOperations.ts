@@ -37,7 +37,7 @@ export const useAiOperations = ({ getEditorText, getSelection, insertText, onEnt
       ));
     } catch (err) {
       console.error("Errore:", err);
-      changeState(new ErrorState(err instanceof Error ? err.message : "Errore sconosciuto", () => changeState(new InputState(onConfirm, () => changeState(new IdleState()), prompt))));
+      changeState(new ErrorState(err instanceof Error ? err.message : "Errore sconosciuto", () => changeState(new IdleState())));
     }
   };
 
@@ -57,7 +57,7 @@ export const useAiOperations = ({ getEditorText, getSelection, insertText, onEnt
         ));
       } catch (err) {
         console.error("Errore:", err);
-        changeState(new ErrorState(err instanceof Error ? err.message : "Errore sconosciuto", () => changeState(new InputState(onConfirm, () => changeState(new IdleState()), prompt))));
+        changeState(new ErrorState(err instanceof Error ? err.message : "Errore sconosciuto", () => changeState(new IdleState())));
       }
     };
 
