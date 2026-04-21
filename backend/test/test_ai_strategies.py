@@ -293,6 +293,12 @@ class TestEdgeCases:
         system, user = strategy.build(text)
         assert text in user
 
+    def test_debono_with_special_characters(self):
+        strategy = DeBonoHatStrategy("Cappello Bianco", "dati e fatti",0.5)
+        text = "Testo con\nnewline e\ttab e 'apici'"
+        system, user = strategy.build(text)
+        assert text in user
+
     # None come input
     def test_simple_prompt_none_raises(self):
         strategy = SimplePromptStrategy("Sei un assistente.", "Riassumi")

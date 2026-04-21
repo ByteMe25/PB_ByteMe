@@ -48,6 +48,33 @@ def test_summary_uses_correct_strategy():
     sys_prompt, _ = config.prompt_strategy.build("test")
     assert "riassume" in sys_prompt.lower() or "summary" in sys_prompt.lower()
 
+def test_fix_grammar_uses_correct_strategy():
+    """Verifica che 'fix_grammar' istruisca l'IA a correggere la grammatica."""
+    config = OPERATION_REGISTRY["fix_grammar"]
+    # Generiamo il prompt di sistema
+    sys_prompt, _ = config.prompt_strategy.build("test")
+    
+    # Verifichiamo che contenga concetti legati alla correzione o grammatica
+    prompt_content = sys_prompt.lower()
+    assert "grammatica" in prompt_content or "grammar" in prompt_content or "correggi" in prompt_content
+
+def test_rewrite_uses_correct_strategy():
+    """Verifica che 'rewrite' istruisca l'IA a riscrivere il testo."""
+    config = OPERATION_REGISTRY["rewrite"]
+    # Recuperiamo entrambi i prompt
+    sys_prompt, user_prompt = config.prompt_strategy.build("test")
+    
+    # Uniamo i prompt per la ricerca così siamo sicuri di trovare la parola
+    full_content = (sys_prompt + user_prompt).lower()
+    
+    assert "riscri" in full_content or "rewrite" in full_content
+
+def test_distant_writing_uses_correct_strategy():
+    """Verifica che 'distant_writing' faccia quello che c'è scritto nel prompt (Espansione)."""
+    config = OPERATION_REGISTRY["distant_writing"]
+    sys_prompt, user_prompt = config.prompt_strategy.build("test")
+    full_content = (sys_prompt + user_prompt).lower()
+    assert "espandi" in full_content or "sviluppa" in full_content or "articolato" in full_content
 # ---------------------------------------------------------------------------
 # 3. Test di Robustezza (Cosa non deve succedere)
 # ---------------------------------------------------------------------------
