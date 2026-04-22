@@ -29,7 +29,7 @@ export const useAiOperations = ({ getEditorText, getSelection, insertText, onEnt
     changeState(new LoadingState());
     try {
       const result = await aiCall.executeOperation({ operationId: operation, text });
-      onEntryAdded?.({ operation, input: text, output: result, timestamp: Date.now() });
+      onEntryAdded?.({ operation, inputText: text, generatedText: result, timestamp: Date.now() });
       changeState(new DoneState(
         result,
         (text) => { insertText(text); changeState(new IdleState()) },
@@ -48,7 +48,7 @@ export const useAiOperations = ({ getEditorText, getSelection, insertText, onEnt
       changeState(new LoadingState());
       try {
         const result = await aiCall.executeOperation({ operationId: "distant_writing", text: context, prompt });
-        onEntryAdded?.({ operation: "distant_writing", input: context, output: result, timestamp: Date.now() });
+        onEntryAdded?.({ operation: "distant_writing", inputText: context, generateText: result, timestamp: Date.now() });
         changeState(new DoneState(
           result,
           (text) => { insertText(text); changeState(new IdleState()) },
