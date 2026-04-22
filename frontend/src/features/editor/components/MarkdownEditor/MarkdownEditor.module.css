@@ -35,6 +35,10 @@
   overflow-x: auto; /* scroll orizzontale se lo schermo è piccolo */
   overflow-y: hidden;
   scrollbar-width: none; /* nasconde la scrollbar su Firefox */
+  /*questo serve per non far scomparire la toolbar*/
+  position: sticky !important;
+  top: 0;
+  z-index: 100;
 }
 
 /* nasconde scrollbar su Chrome/Safari per la toolbar */
