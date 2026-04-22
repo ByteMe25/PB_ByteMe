@@ -1,4 +1,8 @@
 /* Reset e variabili CSS: stile globale */
+
+/* import font*/
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+
 :root {
   /* =========================================
     VARIABILI GLOBALI - PALET DI COLORI
@@ -52,38 +56,34 @@ body {
    REGOLE DI STAMPA - per stampare solo foglio formattato in markdown
    ================================================================== */
 @media print {
-  /*margini fisici del foglio */
+  /* margini fisici del foglio */
   @page { margin: 1.5cm; }
 
-  /*nasconde UI dell'app */
-  .sidebar, .topbar { 
-    display: none !important; 
-  }
-
-  /*nasconde UI EasyMDE */
-  .editor-toolbar, 
-  .editor-statusbar {
+  /* nasconde sidebar e topbar */
+  #root .no-print, 
+  #root .no-print * {
     display: none !important;
   }
 
-  /*nasconde area scrittura (codice sorgente) */
-  .CodeMirror {
-    display: none !important;
+  /* disinnesca le restrizioni di altezza e scorrimento su tutto */
+  * {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important; /* Forza l'uscita del testo dai contenitori */
+    position: static !important;
   }
 
-  /*mostra e adatta l'anteprima formattata */
-  .editor-preview {
+  /* annulla i limiti di altezza e scroll per permettere fogli multipli */
+  html, body, #root, main, article, [class*="layout"], [class*="body"], [class*="container"] {
     display: block !important;
-    width: 100% !important;
-    border: none !important;
-    padding: 0 !important;
-    overflow: visible !important;
-    background: transparent !important;
+    background-color: white !important;
+    color: black !important;
   }
 
-  /* evita spezzamenti indesiderati tra pagine */
-  h1, h2, h3, h4, h5, h6, p, pre, blockquote, table, ul, ol, li {
+  /* Evita spezzamenti orribili a metà pagina per elementi in blocco */
+  h1, h2, h3, h4, h5, h6, p, pre, blockquote, table, ul, ol, li, img {
     page-break-inside: avoid;
+    break-inside: avoid; /* Standard moderno */
   }
 }
 
@@ -94,8 +94,8 @@ body {
 /* linea che separa i gruppi di icone */
 .separator {
   width: 2.5em;
-  height: 0.0625em; /* 1px */
+  height: 0.07em; /* 1px */
   background-color: var(--border-light);
-  margin: 0.5em 0;
+  margin: 0.2em 0;
   border-radius: 0.25em;
 }

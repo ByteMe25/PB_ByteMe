@@ -1,6 +1,6 @@
 /* Formati di esportazione supportati dal sistema - usati in SaveDocumentModal */
 
-export type ExportFormat = 'md' | 'txt' | 'html' | 'pdf' | 'docx' | 'odt';
+export type ExportFormat = 'md' | 'txt' | 'html';
 
 /**
  * Configurazione UI per il dropdown dei formati
@@ -15,10 +15,6 @@ export const EXPORT_FORMAT_OPTIONS: {
   { value: 'md', label: 'Markdown (.md)', mimeType: 'text/markdown' },
   { value: 'txt', label: 'Testo semplice (.txt)', mimeType: 'text/plain' },
   { value: 'html', label: 'HTML (.html)', mimeType: 'text/html' },
-  //non supportati nativamente, potrebbero generare file corrotti - da vedere
-  { value: 'pdf', label: 'PDF (.pdf)', mimeType: 'application/pdf' },
-  { value: 'docx', label: 'Word (.docx)', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' },
-  { value: 'odt', label: 'OpenDocument (.odt)', mimeType: 'application/vnd.oasis.opendocument.text' },
 ];
 
 /**

@@ -6,7 +6,7 @@
   background-color: var(--bg-header);
   border-bottom: 0.0625em solid var(--border-light);
 
-  height: 3.75em; 
+  height: 4.5em; 
   padding: 0 1.25em; 
 }
 
@@ -19,7 +19,7 @@
 
 .brandName {
   font-weight: bold;
-  font-size: 1.2em;
+  font-size: 1.5em;
   color: var(--col-primary);
 }
 

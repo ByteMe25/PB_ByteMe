@@ -48,7 +48,7 @@ test('mostra correttamente la lista di card', () => {
   render(<HistoryList items={mockItems} isLoading={false} error={null} onDelete={() => {}} />);
   
   expect(screen.getByText('summary')).toBeInTheDocument();
-  expect(screen.getByText('fix_grammar')).toBeInTheDocument();
+  expect(screen.getByText('fix grammar')).toBeInTheDocument();
   
   expect(screen.getByRole('list', { name: /storico generazioni/i })).toBeInTheDocument();
 });

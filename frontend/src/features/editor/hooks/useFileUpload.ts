@@ -2,7 +2,7 @@
  * Valida formato/size (fileHandlers.ts), legge con FileReader, aggiorna EasyMDE e store.
 */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { useEditorMetaStore } from '../store/useEditorMetaStore';
 
@@ -11,7 +11,6 @@ const ALLOWED_EXTENSIONS = ['.md', '.txt'];
 
 export const useFileUpload = (onFileLoaded: () => void) => {
   const [isUploading, setIsUploading] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
   const CONTENT_KEY = 'secondbrain-editor-content';
 
   //funzione core che accetta direttamente un File
@@ -60,7 +59,7 @@ export const useFileUpload = (onFileLoaded: () => void) => {
     } catch (error) {
       console.error('Upload error:', error);
     } finally {
-      setIsUploading(false); // Spegne lo spinner SOLO quando ha finito
+      setIsUploading(false); //spegne lo spinner solo quando ha finito
     }
   }, [onFileLoaded]);
 
@@ -73,25 +72,15 @@ export const useFileUpload = (onFileLoaded: () => void) => {
     const target = e.target as HTMLInputElement;
     const file = target.files?.[0];
     if (file) uploadFile(file);
-    input.remove(); // Pulizia
+    input.remove(); //pulizia
   };
   
   input.click();
 }, [uploadFile]);
 
-  const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      uploadFile(file);
-      e.target.value = ''; // Permette di ricaricare lo stesso file consecutivamente
-    }
-  }, [uploadFile]);
-
   return { 
     isUploading, 
     openFilePicker, 
-    uploadFile, //esposto per MarkdownEditor
-    inputRef, 
-    handleFileInput 
+    uploadFile //esposto per MarkdownEditor
   };
 };

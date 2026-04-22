@@ -1,0 +1,112 @@
+.card {
+  background: var(--bg-editor);
+  border: 0.0625em solid var(--border-light);
+  border-radius: 0.5em;
+  overflow: hidden;
+  box-shadow: 0 0.125em 0.5em rgba(0,0,0,0.05);
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 0.25em 1em rgba(0,0,0,0.1);
+  transform: translateY(-0.125em);
+}
+
+.header {
+  padding: 1em 1.5em;
+  background-color: var(--bg-header); /* Come l'intestazione nel POC */
+  border-bottom: 0.0625em solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.operationBadge {
+  font-weight: 700;
+  font-size: 0.85em;
+  padding: 0.3em 0.8em;
+  border: 0.125em solid currentColor;
+  border-radius: 1em;
+  background: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.date {
+  color: var(--text-muted);
+  font-size: 0.85em;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.body {
+  padding: 1.5em;
+}
+
+.inputText {
+  font-size: 0.9em;
+  color: var(--text-muted);
+  background: rgba(8, 2, 44, 0.03); /* Grigio debolissimo */
+  padding: 1em;
+  border-radius: 0.25em;
+  border-left: 0.25em solid var(--border-light);
+  margin-bottom: 1.5em;
+  white-space: pre-wrap;
+}
+
+.outputText {
+  white-space: pre-wrap;
+  line-height: 1.7;
+  color: var(--text-main);
+}
+
+.toggleBtn {
+  background: transparent;
+  border: none;
+  color: var(--col-accent);
+  cursor: pointer;
+  font-size: 0.85em;
+  font-weight: 600;
+  padding: 0;
+  margin-top: 0.5em;
+  display: block;
+}
+
+.toggleBtn:hover {
+  text-decoration: underline;
+}
+
+.footer {
+  padding: 1em 1.5em;
+  background-color: var(--bg-header);
+  border-top: 0.0625em solid var(--border-light);
+  display: flex;
+  justify-content: flex-end;
+  gap: 1em;
+}
+
+.btnAction {
+  background: var(--bg-editor);
+  border: 0.0625em solid var(--border-light);
+  padding: 0.5em 1em;
+  border-radius: 0.25em;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--text-main);
+  transition: all 0.2s;
+}
+
+.btnAction:hover {
+  border-color: var(--col-accent);
+  color: var(--col-primary);
+}
+
+.btnDelete {
+  color: var(--col-error);
+}
+
+.btnDelete:hover {
+  background-color: var(--col-error);
+  color: white;
+  border-color: var(--col-error);
+}

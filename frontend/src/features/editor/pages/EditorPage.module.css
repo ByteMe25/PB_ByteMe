@@ -10,12 +10,15 @@
 .body {
   display: flex;
   flex: 1;
+  min-height: 0; /* permette all'editor di scrollare internamente*/
   overflow: hidden;
 }
 
 .main {
   display: flex;
   flex: 1;
+  min-width: 0; /* evita overflow orizzontale in split-view */
+  min-width: 0; /* per split view */
   overflow: hidden;
   padding: 1em;
   gap: 1em;
