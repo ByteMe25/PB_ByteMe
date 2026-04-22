@@ -70,6 +70,7 @@ export const useEditor = ({ onEntryAdded }: UseEditorProps = {}): UseEditorRetur
       inputStyle: 'contenteditable',
       status: ['autosave', 'lines', 'words', 'cursor'],
       syncSideBySidePreviewScroll: false,
+      
 
       // CONFIGURAZIONE TOOLBAR
       toolbar: [
@@ -215,6 +216,14 @@ export const useEditor = ({ onEntryAdded }: UseEditorProps = {}): UseEditorRetur
     setIsReady(true);
 
 
+    cm.on('drop', (cm, e) => {
+      e.preventDefault();
+    });
+
+    cm.on('dragover', (cm, e) => {
+      e.preventDefault();
+    });
+
     //cleanup: flush immediato + distruzione istanza
     return () => {
       clearTimeout(sideBySideTimer);
@@ -236,7 +245,7 @@ export const useEditor = ({ onEntryAdded }: UseEditorProps = {}): UseEditorRetur
       easyMdeRef.current = null;
       setIsReady(false);
     };
-  }, []);
+  }, [easyMdeRef.current]);
 
 
   // API pubbliche - useCallback per stabilità referenziale (evita re-render)
