@@ -87,7 +87,7 @@ export const AiPanel = ({ getEditorText, getSelection, insertTextAtCursor, onClo
     <div className={styles.aiPanel}>
       <button className={styles.close_btn} onClick={onClose} aria-label="Chiudi pannello AI"><X size={22} /></button>
 
-      <div class="separator" />
+      <div class="icon_separator" />
 
       {BUTTONS.map((btn) =>
         btn.subButtons ? (

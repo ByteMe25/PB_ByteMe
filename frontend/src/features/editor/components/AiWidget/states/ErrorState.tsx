@@ -1,6 +1,7 @@
 import React from 'react'
 import { IWidgetState } from './IWidgetState'
 import {MessageSquareWarning} from 'lucide-react'
+import styles from '../AiWidget.module.css'
 
 export class ErrorState implements IWidgetState {
   constructor(
@@ -12,7 +13,7 @@ export class ErrorState implements IWidgetState {
     return (
       <>
         <MessageSquareWarning size={22}/>
-        <span>{this.message}</span>
+        <span className={styles.error_message}>{this.message}</span>
       </>
     )
   }

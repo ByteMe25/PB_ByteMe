@@ -37,7 +37,7 @@ export const Sidebar = ({ activePage, onNavigate, onUpload, onSave, onPrint, onA
         />
       </nav>
 
-      <div class="separator" />
+      <div class="icon_separator" />
 
       {/* OPERAZIONI FILE (disattivate nello storico) */}
       <div className={styles.group}>
@@ -61,7 +61,7 @@ export const Sidebar = ({ activePage, onNavigate, onUpload, onSave, onPrint, onA
         />
       </div>
 
-      <div className={styles.separator} />
+      <div class="icon_separator" />
 
       {/* icona AI */}
       <div className={styles.group}>

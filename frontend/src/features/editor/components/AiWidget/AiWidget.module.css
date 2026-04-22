@@ -59,3 +59,7 @@ textarea{
     height: 100%;
     border: none;
 }
+
+.error_message{
+    margin-left: 1em;
+}
