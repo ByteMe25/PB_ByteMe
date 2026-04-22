@@ -205,7 +205,6 @@ export const useEditor = ({ onEntryAdded }: UseEditorProps = {}): UseEditorRetur
       saveTimerRef.current = setTimeout(() => {
         try {
           localStorage.setItem(CONTENT_KEY, text);
-          markSaved();
         } catch (e) {
           console.error('❌ Auto-save fallito:', e);
         }
@@ -229,7 +228,6 @@ export const useEditor = ({ onEntryAdded }: UseEditorProps = {}): UseEditorRetur
           saveTimerRef.current = null;
         }
         localStorage.setItem(CONTENT_KEY, finalText);
-        markSaved();
       } catch (e) {
         console.error('❌ Flush save fallito:', e);
       }

@@ -43,7 +43,6 @@ export const useFileUpload = (onFileLoaded: () => void) => {
           const text = e.target?.result as string;
           localStorage.setItem(CONTENT_KEY, text);
           setFileName(file.name.replace(/\.[^/.]+$/, ""));
-          markSaved();
           onFileLoaded(); //dice a useEditor di ricaricare dal localStorage
           toast.success(`File "${file.name}" caricato!`);
           resolve();
