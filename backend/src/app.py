@@ -7,6 +7,7 @@ from flask_cors import CORS
 from src.model_strategies import get_model
 from src.operation_registry import OPERATION_REGISTRY, DEFAULT_OPERATION
 from src.utils.text_cleaning import clean_ai_response
+import traceback
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True) # Permette al frontend di parlare con il backend
@@ -50,7 +51,7 @@ def generate_ai_text():
 
     except Exception as e:
         # Log dell'errore sul terminale per debugging
-        print(f"❌ Errore durante la generazione: {str(e)}")
+        print(f"❌ Errore durante la generazione:\n{traceback.format_exc()}")
         return jsonify({"generated_text": f"❌ Errore critico:\n{str(e)}"}), 500
 
 @app.route('/')
