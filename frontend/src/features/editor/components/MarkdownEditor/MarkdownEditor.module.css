@@ -36,9 +36,6 @@
   overflow-y: hidden;
   scrollbar-width: none; /* nasconde la scrollbar su Firefox */
   /*questo serve per non far scomparire la toolbar*/
-  position: sticky !important;
-  top: 0;
-  z-index: 100;
 }
 
 /* nasconde scrollbar su Chrome/Safari per la toolbar */
@@ -61,14 +58,6 @@
   color: var(--col-accent);
 }
 
-/* fix scroll split view */
-.editorWrapper :global(.EasyMDEContainer) {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  border: none;
-  min-height: 0;
-}
 
 /* Area di Testo (CodeMirror) */
 .editorWrapper :global(.CodeMirror) {
@@ -85,7 +74,6 @@
 /* Scroll interno per CodeMirror */
 .editorWrapper :global(.CodeMirror-scroll) {
   height: 100%;
-  min-height: 0;
   overflow-y: auto !important;
   overflow-x: auto !important;
 }
@@ -96,7 +84,8 @@
    ========================================= */
 .editorWrapper :global(.EasyMDEContainer.sided--no-fullscreen) {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  position: relative;
   align-items: stretch;
   flex: 1;
   min-height: 0;
@@ -108,20 +97,33 @@
   flex: 1 !important; 
   max-width: none !important;
   min-width: 0;
+  min-height: 0;
   height: 100%;
+  margin-right: 50%;
+  overflow: hidden;;
+}
+
+.editorWrapper :global(.EasyMDEContainer.sided--no-fullscreen .editor-toolbar) {
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 /* anteprima prende l'altro 50% dello spazio (flex: 1) */
 .editorWrapper :global(.editor-preview-side) {
   flex: 1 !important; 
   max-width: none !important;
-  position: static !important; /* disinnesca JS EasyMDE come nel POC */
+  position: absolute !important; /* disinnesca JS EasyMDE come nel POC */
   
   /* per scroll interno */
   height: 100% !important; 
   min-height: 0 !important; 
   overflow-y: auto !important; 
   overflow-x: hidden !important;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
 
   border-left: 0.0625em solid rgba(0,0,0,0.08);
   padding: 1.5em;
