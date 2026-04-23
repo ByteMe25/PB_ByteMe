@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AiPanel } from './AiPanel';
 import { useAiOperations } from '../../hooks/useAiOperations';
@@ -30,7 +30,7 @@ const renderAiPanel = (props = {}) => {
 describe('AiPanel Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    useAiWidgetStore.getState().reset(); // stato IdleState di default
+    act(() => { useAiWidgetStore.getState().reset(); });
 
     vi.mocked(useAiOperations).mockReturnValue({
       handleAction: mockHandleAction,
@@ -196,7 +196,7 @@ describe('AiPanel Component', () => {
       renderAiPanel();
       expect(screen.getByRole('button', { name: 'Riassumi il testo' })).toBeDisabled();
 
-      useAiWidgetStore.getState().reset();
+      act(() => { useAiWidgetStore.getState().reset(); });
 
       expect(screen.getByRole('button', { name: 'Riassumi il testo' })).not.toBeDisabled();
     });

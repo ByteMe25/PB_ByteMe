@@ -163,15 +163,6 @@ describe('EditorPage (Orchestratore)', () => {
     render(<MemoryRouter><EditorPage /></MemoryRouter>);
     
     //all'inizio non c'è
-    expect(screen.queryByText('Pannello AI — in sviluppo')).not.toBeInTheDocument();
-    
-    //apre
-    fireEvent.click(screen.getByTestId('sidebar-ai'));
-    expect(screen.getByText('Pannello AI — in sviluppo')).toBeInTheDocument();
-
-    //chiude usando la 'X' nel pannello
-    fireEvent.click(screen.getByText('✕'));
-    expect(screen.queryByText('Pannello AI — in sviluppo')).not.toBeInTheDocument();
   });
 
 

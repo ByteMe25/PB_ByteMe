@@ -32,10 +32,10 @@ export const aiCall = {
  */
   executeOperation: async (payload: AiRequestPayload, signal?: AbortSignal): Promise<string> => {
     const response = await apiClient.post<AiResponse>('/ai/generate', {
-      operation: payload.operationId,  // rinomina qui
+      operationId: payload.operationId,  // rinomina qui
       text: payload.text,
       prompt: payload.prompt,
-    });
+    }, { signal });
     return response.data.generated_text;
   }
 };

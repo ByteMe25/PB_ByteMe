@@ -1,3 +1,4 @@
+// src/features/editor/hooks/useAiOperations.test.ts
 import React from 'react';
 import { renderHook, render, act, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -9,14 +10,25 @@ import { DoneState } from '../components/AiWidget/states/DoneState';
 import { ErrorState } from '../components/AiWidget/states/ErrorState';
 import { InputState } from '../components/AiWidget/states/InputState';
 import { IdleState } from '../components/AiWidget/states/IdleState';
+import axios from 'axios';
 
-// Mock di aiCall per non fare chiamate reali al backend
+
 vi.mock('../api/aiCall', () => ({
   aiCall: {
     executeOperation: vi.fn(),
   },
 }));
 
+vi.mock('axios', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('axios')>();
+  return {
+    ...actual,
+    default: {
+      ...actual.default,
+      isCancel: vi.fn((err) => err?.name === 'CanceledError' || err?.message === 'canceled'),
+    },
+  };
+});
 
 const mockGetEditorText = vi.fn().mockReturnValue('Testo del documento');
 const mockGetSelection = vi.fn().mockReturnValue('');
@@ -39,8 +51,7 @@ const getWidgetState = () => useAiWidgetStore.getState().widgetState;
 describe('useAiOperations Hook', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-
-    useAiWidgetStore.getState().reset();
+    act(() => {useAiWidgetStore.getState().reset();});
   });
 
   // ─── Selezione del testo ─────────────────────────────────────────────────
@@ -93,7 +104,7 @@ describe('useAiOperations Hook', () => {
       });
 
       expect(getWidgetState()).toBeInstanceOf(LoadingState);
-      resolve('ok');
+      resolve('ok'); // evita pending promises
     });
 
     it('imposta DoneState con il risultato dopo una chiamata riuscita', async () => {
@@ -150,7 +161,6 @@ describe('useAiOperations Hook', () => {
       });
 
       const state = getWidgetState() as ErrorState;
-
       expect(JSON.stringify(state.render())).toContain('Errore 503');
     });
 
@@ -334,7 +344,7 @@ describe('useAiOperations Hook', () => {
       expect(getWidgetState()).toBeInstanceOf(IdleState);
     });
 
-    it('Non chiama insertText quando si clicca Scarta', async () => {
+    it('NON chiama insertText quando si clicca Scarta', async () => {
       vi.mocked(aiCall.executeOperation).mockResolvedValueOnce('ok');
 
       const { result } = renderAiOperationsHook();
@@ -347,6 +357,78 @@ describe('useAiOperations Hook', () => {
       fireEvent.click(getByRole('button', { name: 'Scarta' }));
 
       expect(mockInsertText).not.toHaveBeenCalled();
+    });
+  });
+
+  // ─── Annullamento (AbortSignal) ──────────────────────────────────────────
+
+  describe('Annullamento della richiesta', () => {
+    it('passa il signal ad aiCall', async () => {
+      vi.mocked(aiCall.executeOperation).mockResolvedValueOnce('ok');
+
+      const { result } = renderAiOperationsHook();
+      await act(async () => {
+        await result.current.handleAction('summary');
+      });
+
+      expect(aiCall.executeOperation).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.any(AbortSignal)
+      );
+    });
+
+    it('torna a IdleState quando si clicca Annulla nel LoadingState', async () => {
+      let rejectFn!: (err: unknown) => void;
+      vi.mocked(aiCall.executeOperation).mockReturnValueOnce(
+        new Promise((_, r) => (rejectFn = r))
+      );
+
+      const { result } = renderAiOperationsHook();
+      act(() => {
+        result.current.handleAction('summary');
+      });
+
+      const loadingState = getWidgetState() as LoadingState;
+      const { getByRole } = render(<>{loadingState.renderActions()}</>);
+
+      act(() => {
+        fireEvent.click(getByRole('button', { name: 'Annulla' }));
+      });
+
+      await act(async () => {
+        const cancelError = new Error('canceled');
+        cancelError.name = 'CanceledError';
+        rejectFn(cancelError);
+      });
+
+      expect(getWidgetState()).toBeInstanceOf(IdleState);
+    });
+
+    it('Non imposta ErrorState se la richiesta viene annullata', async () => {
+      let rejectFn!: (err: unknown) => void;
+      vi.mocked(aiCall.executeOperation).mockReturnValueOnce(
+        new Promise((_, r) => (rejectFn = r))
+      );
+
+      const { result } = renderAiOperationsHook();
+      act(() => {
+        result.current.handleAction('summary');
+      });
+
+      const loadingState = getWidgetState() as LoadingState;
+      const { getByRole } = render(<>{loadingState.renderActions()}</>);
+
+      act(() => {
+        fireEvent.click(getByRole('button', { name: 'Annulla' }));
+      });
+
+      await act(async () => {
+        const cancelError = new Error('canceled');
+        cancelError.name = 'CanceledError';
+        rejectFn(cancelError);
+      });
+
+      expect(getWidgetState()).not.toBeInstanceOf(ErrorState);
     });
   });
 });

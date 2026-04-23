@@ -52,10 +52,25 @@ describe('AiWidget Component', () => {
       expect(screen.getByText('Loading…')).toBeInTheDocument();
     });
 
-    it('non mostra azioni durante il caricamento', () => {
-      setWidgetState(new LoadingState());
+    it('mostra il pulsante Annulla se LoadingState ha onCancel', () => {
+      const mockOnCancel = vi.fn();
+      setWidgetState(new LoadingState(mockOnCancel));
       render(<AiWidget />);
-      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Annulla' })).toBeInTheDocument();
+    });
+
+    it('chiama onCancel quando si clicca Annulla', () => {
+      const mockOnCancel = vi.fn();
+      setWidgetState(new LoadingState(mockOnCancel));
+      render(<AiWidget />);
+      fireEvent.click(screen.getByRole('button', { name: 'Annulla' }));
+      expect(mockOnCancel).toHaveBeenCalledTimes(1);
+    });
+
+    it('non mostra azioni se LoadingState non ha onCancel', () => {
+      setWidgetState(new LoadingState()); // senza callback
+      render(<AiWidget />);
+      expect(screen.queryByRole('button', { name: 'Annulla' })).not.toBeInTheDocument();
     });
   });
 

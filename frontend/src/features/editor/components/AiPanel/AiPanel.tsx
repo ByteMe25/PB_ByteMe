@@ -106,8 +106,8 @@ export const AiPanel = ({ getEditorText, getSelection, insertTextAtCursor, onClo
                 {btn.subButtons.map((sub) => (
                   <div className={styles.button_wrapper} data-tooltip={!isIdle ? "Completa o scarta la generazione corrente" : undefined}>
                     <EditorButton
-                      icon={btn.icon}
-                      label={btn.label}
+                      icon={sub.icon}
+                      label={sub.label}
                       disabled={!isIdle}
                       onClick={() => handleSubAction(sub.operation)}
                     />
