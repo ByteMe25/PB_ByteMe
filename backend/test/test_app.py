@@ -82,7 +82,7 @@ class TestGenerateOperations:
 
     @pytest.fixture(autouse=True)
     def load_mapper(self):
-        from backend.src.operation_mapper import OPERATION_MAPPER
+        from src.operation_mapper import OPERATION_MAPPER
         self.mapper = OPERATION_MAPPER
 
     @pytest.mark.parametrize("operation_name", [
