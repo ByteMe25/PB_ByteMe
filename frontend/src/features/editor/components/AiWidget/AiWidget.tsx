@@ -7,7 +7,7 @@ import { IdleState } from './states/IdleState'
 
 export function AiWidget() {
     const widgetState = useAiWidgetStore((s) => s.widgetState)
-    const { pos, onMouseDown } = useDraggable(100, 100)
+    const { pos, onMouseDown } = useDraggable(100, 200)
 
     if (widgetState instanceof IdleState) return null
 

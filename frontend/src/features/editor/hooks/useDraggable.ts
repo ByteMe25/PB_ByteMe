@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react'
 
-export function useDraggable(initialX = 100, initialY = 100) {
+export function useDraggable(initialX = 100, initialY = 200) {
   const [pos, setPos] = useState({ x: initialX, y: initialY })
   const dragging = useRef(false)
   const offset = useRef({ x: 0, y: 0 })
