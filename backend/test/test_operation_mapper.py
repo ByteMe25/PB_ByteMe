@@ -1,5 +1,5 @@
 import pytest
-from backend.src.operation_mapper import OPERATION_MAPPER, DEFAULT_OPERATION, OperationConfig
+from src.operation_mapper import OPERATION_MAPPER, DEFAULT_OPERATION, OperationConfig
 from src.ai_strategies import BaseAIStrategy
 import src.model_strategies
 import re
