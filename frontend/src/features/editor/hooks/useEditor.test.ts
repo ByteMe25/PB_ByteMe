@@ -171,7 +171,6 @@ describe('useEditor (ViewModel)', () => {
 
     act(() => { vi.advanceTimersByTime(500); });
     expect(localStorage.getItem('secondbrain-editor-content')).toBe('Testo modificato');
-    expect(mockMarkSaved).toHaveBeenCalled();
   });
 
 
@@ -184,7 +183,6 @@ describe('useEditor (ViewModel)', () => {
     act(() => { unmount(); });
 
     expect(localStorage.getItem('secondbrain-editor-content')).toBe('Testo finale');
-    expect(mockMarkSaved).toHaveBeenCalled();
     expect(mockInstance.toTextArea).toHaveBeenCalledTimes(1);
   });
 

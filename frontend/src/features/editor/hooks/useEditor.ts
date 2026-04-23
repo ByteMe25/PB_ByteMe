@@ -245,7 +245,7 @@ export const useEditor = ({ onEntryAdded }: UseEditorProps = {}): UseEditorRetur
       easyMdeRef.current = null;
       setIsReady(false);
     };
-  }, [easyMdeRef.current]);
+  }, []);
 
 
   // API pubbliche - useCallback per stabilità referenziale (evita re-render)

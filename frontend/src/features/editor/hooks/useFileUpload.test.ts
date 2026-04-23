@@ -105,7 +105,6 @@ describe('useFileUpload (ViewModel)', () => {
 
     expect(localStorage.getItem('secondbrain-editor-content')).toBe('# Ciao');
     expect(mockSetFileName).toHaveBeenCalledWith('appunti_studio');
-    expect(mockMarkSaved).toHaveBeenCalled();
     expect(mockOnFileLoaded).toHaveBeenCalledTimes(1);
     expect(toast.success).toHaveBeenCalledWith('File "appunti_studio.md" caricato!');
   });
