@@ -25,10 +25,10 @@ def generate_ai_text():
 
     if operation == 'distant_writing':
         if not prompt:
-            return jsonify({"generated_text": "❌ Nessun prompt fornito."}), 400
+            return jsonify({"message": "❌ Nessun prompt fornito."}), 400
     else:
         if not text:
-            return jsonify({"generated_text": "❌ Nessun testo fornito."}), 400
+            return jsonify({"message": "❌ Nessun testo fornito."}), 400
 
     # Recupera la configurazione (modello + prompt) dal Registry
     config = OPERATION_REGISTRY.get(operation) or OPERATION_REGISTRY[DEFAULT_OPERATION]
@@ -52,7 +52,7 @@ def generate_ai_text():
     except Exception as e:
         # Log dell'errore sul terminale per debugging
         print(f"❌ Errore durante la generazione:\n{traceback.format_exc()}")
-        return jsonify({"generated_text": f"❌ Errore critico:\n{str(e)}"}), 500
+        return jsonify({"message": f"❌ Errore critico:\n{str(e)}"}), 500
 
 @app.route('/')
 def root():
