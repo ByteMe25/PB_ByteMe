@@ -67,7 +67,8 @@ describe('useAiOperations Hook', () => {
       });
 
       expect(aiCall.executeOperation).toHaveBeenCalledWith(
-        expect.objectContaining({ text: 'Testo selezionato' })
+        expect.objectContaining({ text: 'Testo selezionato' }),
+        expect.any(AbortSignal)
       );
     });
 
@@ -82,7 +83,8 @@ describe('useAiOperations Hook', () => {
       });
 
       expect(aiCall.executeOperation).toHaveBeenCalledWith(
-        expect.objectContaining({ text: 'Intero documento' })
+        expect.objectContaining({ text: 'Intero documento' }),
+        expect.any(AbortSignal)
       );
     });
   });
@@ -91,7 +93,6 @@ describe('useAiOperations Hook', () => {
 
   describe('handleAction - operazione generica', () => {
     it('imposta LoadingState prima di chiamare aiCall', async () => {
-      // Lascia la Promise in sospeso per catturare il loading
       let resolve!: (v: string) => void;
       vi.mocked(aiCall.executeOperation).mockReturnValueOnce(
         new Promise((r) => (resolve = r))
@@ -104,7 +105,7 @@ describe('useAiOperations Hook', () => {
       });
 
       expect(getWidgetState()).toBeInstanceOf(LoadingState);
-      resolve('ok'); // evita pending promises
+      resolve('ok');
     });
 
     it('imposta DoneState con il risultato dopo una chiamata riuscita', async () => {
@@ -185,7 +186,8 @@ describe('useAiOperations Hook', () => {
       });
 
       expect(aiCall.executeOperation).toHaveBeenCalledWith(
-        expect.objectContaining({ operationId: 'translate_en' })
+        expect.objectContaining({ operationId: 'translate_en' }),
+        expect.any(AbortSignal)
       );
     });
   });
@@ -225,7 +227,8 @@ describe('useAiOperations Hook', () => {
         expect.objectContaining({
           operationId: 'distant_writing',
           prompt: 'Scrivi un articolo su React',
-        })
+        }),
+        expect.any(AbortSignal)
       );
     });
 

@@ -112,6 +112,14 @@ describe('EditorPage (Orchestratore)', () => {
       markDirty: vi.fn()
     });
 
+    vi.mock('../components/AiPanel/AiPanel', () => ({
+      AiPanel: ({ onClose }: any) => (
+        <div data-testid="mock-ai-panel">
+          <button aria-label="Chiudi pannello AI" onClick={onClose}>X</button>
+        </div>
+      )
+    }));
+
     vi.mocked(useHistoryStore).mockReturnValue(vi.fn() as any);
     
     //evita che window.confirm blocchi i test
@@ -158,11 +166,19 @@ describe('EditorPage (Orchestratore)', () => {
     expect(mockUploadFile).toHaveBeenCalledTimes(1);
   });
 
-
   it('mostra e nasconde il pannello AI cliccando il bottone nella Sidebar', () => {
     render(<MemoryRouter><EditorPage /></MemoryRouter>);
-    
-    //all'inizio non c'è
+  
+    // all'inizio il pannello non è visibile
+    expect(screen.queryByTestId('mock-ai-panel')).not.toBeInTheDocument();
+  
+    // click su "AI Panel" nella Sidebar → pannello aperto
+    fireEvent.click(screen.getByTestId('sidebar-ai'));
+    expect(screen.getByTestId('mock-ai-panel')).toBeInTheDocument();
+  
+    // click sulla X dentro l'AiPanel → pannello chiuso
+    fireEvent.click(screen.getByRole('button', { name: 'Chiudi pannello AI' }));
+    expect(screen.queryByTestId('mock-ai-panel')).not.toBeInTheDocument();
   });
 
 
