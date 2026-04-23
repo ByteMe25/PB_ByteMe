@@ -35,7 +35,7 @@ describe('aiCall - Operazioni AI (Facade)', () => {
   });
 
 
-  it('invia una richiesta di traduzione con la chiave di registro esatta del backend', async () => {
+  it('invia una richiesta di traduzione con la chiave di mapper esatta del backend', async () => {
     vi.mocked(apiClient.post).mockResolvedValue({ data: { generated_text: 'Hello' } });
 
     //passiamo direttamente 'translate_en' come si aspetta il backend

@@ -13,7 +13,7 @@ class OperationConfig:
     prompt_strategy: BaseAIStrategy
 
 
-OPERATION_REGISTRY: dict[str, OperationConfig] = {
+OPERATION_MAPPER: dict[str, OperationConfig] = {
     # Operazioni editoriali standard → Llama 3.2 (per ora)
     "summary":   OperationConfig(model_strategies.ZucchettiLlamaStrategy, STRATEGIES["summary"]),
     "fix_grammar": OperationConfig(model_strategies.ZucchettiLlamaStrategy, STRATEGIES["fix_grammar"]),

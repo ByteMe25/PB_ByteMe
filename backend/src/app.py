@@ -5,7 +5,7 @@ import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from src.model_strategies import get_model
-from src.operation_registry import OPERATION_REGISTRY, DEFAULT_OPERATION
+from src.operation_mapper import OPERATION_MAPPER, DEFAULT_OPERATION
 from src.utils.text_cleaning import clean_ai_response
 
 app = Flask(__name__)
@@ -14,7 +14,7 @@ CORS(app, supports_credentials=True) # Permette al frontend di parlare con il ba
 @app.route('/api/ai/generate', methods=['POST'])
 def generate_ai_text():
     """
-    Endpoint principale: riceve il testo, sceglie la strategia dal Registry,
+    Endpoint principale: riceve il testo, sceglie la strategia dal Mapper,
     interroga l'IA e pulisce la risposta.
     """
     data = request.json
@@ -24,8 +24,8 @@ def generate_ai_text():
     if not text:
         return jsonify({"generated_text": "❌ Nessun testo fornito."}), 400
 
-    # Recupera la configurazione (modello + prompt) dal Registry
-    config = OPERATION_REGISTRY.get(operation) or OPERATION_REGISTRY[DEFAULT_OPERATION]
+    # Recupera la configurazione (modello + prompt) dal Mapper
+    config = OPERATION_MAPPER.get(operation) or OPERATION_MAPPER[DEFAULT_OPERATION]
 
     try:
         # Ottiene l'istanza del modello e costruisce i prompt
@@ -54,7 +54,7 @@ def root():
     return jsonify({
         "service": "Second Brain Backend",
         "status": "running",
-        "active_operations": list(OPERATION_REGISTRY.keys())
+        "active_operations": list(OPERATION_MAPPER.keys())
     })
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 //modulo che fa da Facade per le chiamate AI dell'Editor, fornendo un'interfaccia semplice e coerente
 import apiClient from '../../../lib/apiClient';
 
-//mappatura operazioni AI - con OPERATION_REGISTRY del backend (app.py)
+//mappatura operazioni AI - con OPERATION_MAPPER del backend (app.py)
 export type AiOperationId = 
   | 'summary' 
   | 'rewrite' 

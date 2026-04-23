@@ -58,7 +58,7 @@ class TestGenerateInputValidation:
  
     def test_unknown_operation_falls_back_to_default(self, client):
         """
-        Se l'operazione richiesta non esiste nel registry, il sistema
+        Se l'operazione richiesta non esiste nel mapper, il sistema
         deve fare fallback sull'operazione di default ('summary')
         invece di crashare.
         """
@@ -81,9 +81,9 @@ class TestGenerateInputValidation:
 class TestGenerateOperations:
 
     @pytest.fixture(autouse=True)
-    def load_registry(self):
-        from src.operation_registry import OPERATION_REGISTRY
-        self.registry = OPERATION_REGISTRY
+    def load_mapper(self):
+        from backend.src.operation_mapper import OPERATION_MAPPER
+        self.mapper = OPERATION_MAPPER
 
     @pytest.mark.parametrize("operation_name", [
         "summary", "fix_grammar", "rewrite", "distant_writing"

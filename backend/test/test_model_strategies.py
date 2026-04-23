@@ -152,7 +152,7 @@ def test_zucchetti_llama_empty_response(mock_openai_class):
 
 @patch('src.model_strategies.OpenAI')
 def test_get_model_recreation(mock_openai):
-    """Verifica che il modello venga ricreato se il registro viene svuotato."""
+    """Verifica che il modello venga ricreato se il mapper viene svuotato."""
     from src.model_strategies import _model_instances, get_model, ZucchettiLlamaStrategy
     
     # 1. Pulizia iniziale
