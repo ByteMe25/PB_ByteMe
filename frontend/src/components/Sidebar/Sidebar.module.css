@@ -20,12 +20,3 @@
   gap: 0.75em;
   width: 100%;
 }
-
-/* linea che separa i gruppi di icone */
-.separator {
-  width: 2.5em;
-  height: 0.07em; /* 1px */
-  background-color: var(--border-light);
-  margin: 0.2em 0;
-  border-radius: 0.25em;
-}

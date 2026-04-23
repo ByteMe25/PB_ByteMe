@@ -86,3 +86,16 @@ body {
     break-inside: avoid; /* Standard moderno */
   }
 }
+
+/* ==================================================================
+   CLASSI CONDIVISE PER TUTTI I COMPONENTI
+   ================================================================== */
+
+/* linea che separa i gruppi di icone */
+.icon_separator {
+  width: 2.5em;
+  height: 0.07em; /* 1px */
+  background-color: var(--border-light);
+  margin: 0.2em 0;
+  border-radius: 0.25em;
+}

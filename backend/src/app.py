@@ -7,6 +7,7 @@ from flask_cors import CORS
 from src.model_strategies import get_model
 from src.operation_mapper import OPERATION_MAPPER, DEFAULT_OPERATION
 from src.utils.text_cleaning import clean_ai_response
+import traceback
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True) # Permette al frontend di parlare con il backend
@@ -19,10 +20,15 @@ def generate_ai_text():
     """
     data = request.json
     text = data.get('text', '')
+    prompt = data.get('prompt', '')
     operation = data.get('operation', DEFAULT_OPERATION)
 
-    if not text:
-        return jsonify({"generated_text": "❌ Nessun testo fornito."}), 400
+    if operation == 'distant_writing':
+        if not prompt:
+            return jsonify({"message": "❌ Nessun prompt fornito."}), 400
+    else:
+        if not text:
+            return jsonify({"message": "❌ Nessun testo fornito."}), 400
 
     # Recupera la configurazione (modello + prompt) dal Mapper
     config = OPERATION_MAPPER.get(operation) or OPERATION_MAPPER[DEFAULT_OPERATION]
@@ -30,7 +36,7 @@ def generate_ai_text():
     try:
         # Ottiene l'istanza del modello e costruisce i prompt
         model = get_model(config.model_class)
-        system_prompt, user_prompt = config.prompt_strategy.build(text)
+        system_prompt, user_prompt = config.prompt_strategy.build(text, prompt)
         
         # Recupera la temperatura specifica della strategia (es. 0.8 per il Cappello Verde)
         temp = config.prompt_strategy.temperature
@@ -45,8 +51,8 @@ def generate_ai_text():
 
     except Exception as e:
         # Log dell'errore sul terminale per debugging
-        print(f"❌ Errore durante la generazione: {str(e)}")
-        return jsonify({"generated_text": f"❌ Errore critico:\n{str(e)}"}), 500
+        print(f"❌ Errore durante la generazione:\n{traceback.format_exc()}")
+        return jsonify({"message": f"❌ Errore critico:\n{str(e)}"}), 500
 
 @app.route('/')
 def root():
