@@ -215,7 +215,7 @@ describe('useAiOperations Hook', () => {
       });
 
       const inputState = getWidgetState() as InputState;
-      const { getByRole, getByPlaceholderText } = render(<>{inputState.render()}</>);
+      const { getByRole, getByPlaceholderText } = render(inputState.render() as React.ReactElement);
       fireEvent.change(getByPlaceholderText(/Descrivi qualcosa/i), {
         target: { value: 'Scrivi un articolo su React' },
       });
@@ -241,7 +241,7 @@ describe('useAiOperations Hook', () => {
       });
 
       const inputState = getWidgetState() as InputState;
-      const { getByRole, getByPlaceholderText } = render(<>{inputState.render()}</>);
+      const { getByRole, getByPlaceholderText } = render(inputState.render() as React.ReactElement);
       fireEvent.change(getByPlaceholderText(/Descrivi qualcosa/i), {
         target: { value: 'Qualsiasi prompt' },
       });
@@ -250,7 +250,7 @@ describe('useAiOperations Hook', () => {
       });
 
       const doneState = getWidgetState() as DoneState;
-      const { queryByRole } = render(<>{doneState.renderActions()}</>);
+      const { queryByRole } = render(doneState.renderActions() as React.ReactElement);
       expect(queryByRole('button', { name: 'Rigenera' })).toBeInTheDocument();
     });
 
@@ -263,7 +263,7 @@ describe('useAiOperations Hook', () => {
       });
 
       const inputState = getWidgetState() as InputState;
-      const { getByRole, getByPlaceholderText } = render(<>{inputState.render()}</>);
+      const { getByRole, getByPlaceholderText } = render(inputState.render() as React.ReactElement);
       fireEvent.change(getByPlaceholderText(/Descrivi qualcosa/i), {
         target: { value: 'Prompt originale' },
       });
@@ -272,7 +272,7 @@ describe('useAiOperations Hook', () => {
       });
 
       const doneState = getWidgetState() as DoneState;
-      const { getByRole: getByRoleDone } = render(<>{doneState.renderActions()}</>);
+      const { getByRole: getByRoleDone } = render(doneState.renderActions() as React.ReactElement);
       act(() => {
         fireEvent.click(getByRoleDone('button', { name: 'Rigenera' }));
       });
@@ -281,17 +281,88 @@ describe('useAiOperations Hook', () => {
     });
   });
 
-  // ─── handleDistantWriting (esposto direttamente) ──────────────────────────
+  // ─── Rigenera nelle operazioni normali ───────────────────────────────────
 
-  describe('handleDistantWriting', () => {
-    it('imposta subito InputState senza parametri iniziali', () => {
+  describe('Rigenera nelle operazioni normali', () => {
+    it('DoneState mostra il pulsante Rigenera', async () => {
+      vi.mocked(aiCall.executeOperation).mockResolvedValueOnce('Risultato');
+
       const { result } = renderAiOperationsHook();
-
-      act(() => {
-        result.current.handleDistantWriting();
+      await act(async () => {
+        await result.current.handleAction('summary');
       });
 
-      expect(getWidgetState()).toBeInstanceOf(InputState);
+      const doneState = getWidgetState() as DoneState;
+      const { queryByRole } = render(doneState.renderActions() as React.ReactElement);
+      expect(queryByRole('button', { name: 'Rigenera' })).toBeInTheDocument();
+    });
+
+    it('cliccando Rigenera chiama di nuovo aiCall con gli stessi parametri', async () => {
+      mockGetSelection.mockReturnValue('Testo originale');
+      vi.mocked(aiCall.executeOperation)
+        .mockResolvedValueOnce('Primo risultato')
+        .mockResolvedValueOnce('Secondo risultato');
+
+      const { result } = renderAiOperationsHook();
+      await act(async () => {
+        await result.current.handleAction('summary');
+      });
+
+      const doneState = getWidgetState() as DoneState;
+      const { getByRole } = render(doneState.renderActions() as React.ReactElement);
+      await act(async () => {
+        fireEvent.click(getByRole('button', { name: 'Rigenera' }));
+      });
+
+      expect(aiCall.executeOperation).toHaveBeenCalledTimes(2);
+      expect(aiCall.executeOperation).toHaveBeenLastCalledWith(
+        expect.objectContaining({ operationId: 'summary', text: 'Testo originale' }),
+        expect.any(AbortSignal)
+      );
+    });
+
+    it('cliccando Rigenera usa il testo originale anche se la selezione è cambiata', async () => {
+      mockGetSelection.mockReturnValueOnce('Testo originale');
+      vi.mocked(aiCall.executeOperation)
+        .mockResolvedValueOnce('Primo risultato')
+        .mockResolvedValueOnce('Secondo risultato');
+
+      const { result } = renderAiOperationsHook();
+      await act(async () => {
+        await result.current.handleAction('summary');
+      });
+
+      mockGetSelection.mockReturnValue('Testo diverso');
+
+      const doneState = getWidgetState() as DoneState;
+      const { getByRole } = render(doneState.renderActions() as React.ReactElement);
+      await act(async () => {
+        fireEvent.click(getByRole('button', { name: 'Rigenera' }));
+      });
+
+      expect(aiCall.executeOperation).toHaveBeenLastCalledWith(
+        expect.objectContaining({ text: 'Testo originale' }),
+        expect.any(AbortSignal)
+      );
+    });
+
+    it('cliccando Rigenera porta prima in LoadingState poi in DoneState', async () => {
+      vi.mocked(aiCall.executeOperation)
+        .mockResolvedValueOnce('Primo')
+        .mockResolvedValueOnce('Secondo');
+
+      const { result } = renderAiOperationsHook();
+      await act(async () => {
+        await result.current.handleAction('rewrite');
+      });
+
+      const doneState = getWidgetState() as DoneState;
+      const { getByRole } = render(doneState.renderActions() as React.ReactElement);
+      await act(async () => {
+        fireEvent.click(getByRole('button', { name: 'Rigenera' }));
+      });
+
+      expect(getWidgetState()).toBeInstanceOf(DoneState);
     });
   });
 
@@ -307,7 +378,7 @@ describe('useAiOperations Hook', () => {
       });
 
       const doneState = getWidgetState() as DoneState;
-      const { getByRole } = render(<>{doneState.renderActions()}</>);
+      const { getByRole } = render(doneState.renderActions() as React.ReactElement);
       fireEvent.click(getByRole('button', { name: 'Inserisci' }));
 
       expect(mockInsertText).toHaveBeenCalledWith('Testo finale');
@@ -322,7 +393,7 @@ describe('useAiOperations Hook', () => {
       });
 
       const doneState = getWidgetState() as DoneState;
-      const { getByRole } = render(<>{doneState.renderActions()}</>);
+      const { getByRole } = render(doneState.renderActions() as React.ReactElement);
       act(() => {
         fireEvent.click(getByRole('button', { name: 'Inserisci' }));
       });
@@ -339,7 +410,7 @@ describe('useAiOperations Hook', () => {
       });
 
       const doneState = getWidgetState() as DoneState;
-      const { getByRole } = render(<>{doneState.renderActions()}</>);
+      const { getByRole } = render(doneState.renderActions() as React.ReactElement);
       act(() => {
         fireEvent.click(getByRole('button', { name: 'Scarta' }));
       });
@@ -356,7 +427,7 @@ describe('useAiOperations Hook', () => {
       });
 
       const doneState = getWidgetState() as DoneState;
-      const { getByRole } = render(<>{doneState.renderActions()}</>);
+      const { getByRole } = render(doneState.renderActions() as React.ReactElement);
       fireEvent.click(getByRole('button', { name: 'Scarta' }));
 
       expect(mockInsertText).not.toHaveBeenCalled();
@@ -392,7 +463,7 @@ describe('useAiOperations Hook', () => {
       });
 
       const loadingState = getWidgetState() as LoadingState;
-      const { getByRole } = render(<>{loadingState.renderActions()}</>);
+      const { getByRole } = render(loadingState.renderActions() as React.ReactElement);
 
       act(() => {
         fireEvent.click(getByRole('button', { name: 'Annulla' }));
@@ -419,7 +490,7 @@ describe('useAiOperations Hook', () => {
       });
 
       const loadingState = getWidgetState() as LoadingState;
-      const { getByRole } = render(<>{loadingState.renderActions()}</>);
+      const { getByRole } = render(loadingState.renderActions() as React.ReactElement);
 
       act(() => {
         fireEvent.click(getByRole('button', { name: 'Annulla' }));

@@ -7,7 +7,7 @@ import { DoneState } from "../components/AiWidget/states/DoneState";
 import { IdleState } from "../components/AiWidget/states/IdleState";
 import { ErrorState } from "../components/AiWidget/states/ErrorState";
 import { InputState } from "../components/AiWidget/states/InputState";
-import axios from "axios"
+import axios from "axios";
 
 interface UseAiOperationsProps {
   getEditorText: () => string;
@@ -19,7 +19,7 @@ interface UseAiOperationsProps {
 export const useAiOperations = ({ getEditorText, getSelection, insertText, onEntryAdded }: UseAiOperationsProps) => {
   const changeState = useAiWidgetStore((s) => s.changeState);
   const controllerRef = useRef<AbortController | null>(null);
- 
+
   const abort = () => {
     controllerRef.current?.abort();
     controllerRef.current = null;
@@ -30,26 +30,22 @@ export const useAiOperations = ({ getEditorText, getSelection, insertText, onEnt
     changeState(new IdleState());
   };
 
-  const handleAction = async (operation: AiOperationId): Promise<void> => {
-
-    if (operation === "distant_writing") {
-      handleDistantWriting();
-      return;
-    }
-
-    const text = getSelection() || getEditorText();
-
+  const runOperation = async (
+    params: Parameters<typeof aiCall.executeOperation>[0],
+    onRegenerate: () => void,
+    entryMeta: Record<string, unknown>,
+  ): Promise<void> => {
     abort();
     controllerRef.current = new AbortController();
-
     changeState(new LoadingState(handleCancel));
     try {
-      const result = await aiCall.executeOperation({ operationId: operation, text }, controllerRef.current.signal);
-      onEntryAdded?.({ operation, inputText: text, generatedText: result, timestamp: Date.now() });
+      const result = await aiCall.executeOperation(params, controllerRef.current.signal);
+      onEntryAdded?.({ ...entryMeta, generatedText: result, timestamp: Date.now() });
       changeState(new DoneState(
         result,
-        (text) => { insertText(text); changeState(new IdleState()) },
-        () => changeState(new IdleState())
+        (text) => { insertText(text); changeState(new IdleState()); },
+        () => changeState(new IdleState()),
+        onRegenerate,
       ));
     } catch (err) {
       if (axios.isCancel(err)) return;
@@ -58,32 +54,33 @@ export const useAiOperations = ({ getEditorText, getSelection, insertText, onEnt
     }
   };
 
+  const executeOperation = (operation: AiOperationId, text: string) =>
+    runOperation(
+      { operationId: operation, text },
+      () => executeOperation(operation, text),
+      { operation, inputText: text },
+    );
+
   const handleDistantWriting = () => {
-    const onConfirm = async (prompt: string) => {
+    const onConfirm = (prompt: string) => {
       const context = getSelection() || getEditorText();
-
-      abort();
-      controllerRef.current = new AbortController();
-
-      changeState(new LoadingState(handleCancel));
-      try {
-        const result = await aiCall.executeOperation({ operationId: "distant_writing", text: context, prompt }, controllerRef.current.signal);
-        onEntryAdded?.({ operation: "distant_writing", inputText: context, generateText: result, timestamp: Date.now() });
-        changeState(new DoneState(
-          result,
-          (text) => { insertText(text); changeState(new IdleState()) },
-          () => changeState(new IdleState()),
-          () => changeState(new InputState(onConfirm, () => changeState(new IdleState()), prompt))
-        ));
-      } catch (err) {
-        if (axios.isCancel(err)) return;
-        console.error("Errore:", err);
-        changeState(new ErrorState(err instanceof Error ? err.message : "Errore sconosciuto", () => changeState(new IdleState())));
-      }
+      runOperation(
+        { operationId: "distant_writing", text: context, prompt },
+        () => changeState(new InputState(onConfirm, () => changeState(new IdleState()), prompt)),
+        { operation: "distant_writing", inputText: context },
+      );
     };
-
     changeState(new InputState(onConfirm, () => changeState(new IdleState())));
   };
 
-  return { handleAction, handleDistantWriting };
+  const handleAction = (operation: AiOperationId): void => {
+    if (operation === "distant_writing") {
+      handleDistantWriting();
+      return;
+    }
+    const text = getSelection() || getEditorText();
+    executeOperation(operation, text);
+  };
+
+  return { handleAction };
 };
