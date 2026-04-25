@@ -21,7 +21,7 @@ def generate_ai_text():
     data = request.json
     text = data.get('text', '')
     prompt = data.get('prompt', '')
-    operation = data.get('operation', DEFAULT_OPERATION)
+    operation = data.get('operationId', DEFAULT_OPERATION)
 
     if operation == 'distant_writing':
         if not prompt:
