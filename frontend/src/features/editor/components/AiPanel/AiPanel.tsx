@@ -33,6 +33,7 @@ const BUTTONS: ButtonConfig[] = [
       { id: "translate_it", icon: "🇮🇹", label: "Italiano", operation: "translate_it" },
       { id: "translate_es", icon: "🇪🇸", label: "Spagnolo", operation: "translate_es" },
       { id: "translate_de", icon: "🇩🇪", label: "Tedesco", operation: "translate_de" },
+      { id: "translate_fr", icon: "🇫🇷", label: "Francese", operation: "translate_fr" },
     ],
   },
   {
