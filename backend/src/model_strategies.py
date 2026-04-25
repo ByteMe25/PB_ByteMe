@@ -1,6 +1,8 @@
 import os
 from openai import OpenAI
 from typing import Type
+from functools import lru_cache
+from typing import Type
 
 class AIModelStrategy:
     """
@@ -15,17 +17,10 @@ class AIModelStrategy:
     
 
 
-_model_instances: dict[str, AIModelStrategy] = {}
-
+@lru_cache(maxsize=None)
 def get_model(model_class: Type[AIModelStrategy]) -> AIModelStrategy:
-    """
-    Restituisce sempre la stessa istanza per una data classe.
-    Se l'istanza non esiste ancora, la crea e la mette in cache.
-    """
-    key = model_class.__name__
-    if key not in _model_instances:
-        _model_instances[key] = model_class()
-    return _model_instances[key]
+    return model_class()
+
 
 # Strategie concrete
 class ZucchettiLlamaStrategy(AIModelStrategy):

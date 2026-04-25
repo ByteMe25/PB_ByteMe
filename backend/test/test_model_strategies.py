@@ -15,16 +15,17 @@ def test_base_strategy_raises_not_implemented():
 # ---------------------------------------------------------------------------
 # 2. Test del Singleton / Factory (get_model)
 # ---------------------------------------------------------------------------
-def test_get_model_returns_singleton():
-    """Verifica che get_model restituisca sempre la stessa istanza (Singleton)."""
-    # Usiamo una sottoclasse finta per il test
+def test_get_model_cache_clear():
     class TestStrategy(AIModelStrategy): pass
-    
+
     instance1 = get_model(TestStrategy)
-    instance2 = get_model(TestStrategy)
     
-    assert instance1 is instance2
-    assert isinstance(instance1, TestStrategy)
+    # reset cache
+    get_model.cache_clear()
+    
+    instance2 = get_model(TestStrategy)
+
+    assert instance1 is not instance2
 
 # ---------------------------------------------------------------------------
 # 3. Test della Strategia Zucchetti (con Mocking)
@@ -151,16 +152,13 @@ def test_zucchetti_llama_empty_response(mock_openai_class):
         strategy.generate("sys", "user")
 
 @patch('src.model_strategies.OpenAI')
-def test_get_model_recreation(mock_openai):
-    """Verifica che il modello venga ricreato se il mapper viene svuotato."""
-    from src.model_strategies import _model_instances, get_model, ZucchettiLlamaStrategy
-    
-    # 1. Pulizia iniziale
-    _model_instances.clear() 
-    
-    # 2. Creazione del modello (il mock impedisce il crash per api_key mancante)
-    model = get_model(ZucchettiLlamaStrategy)
-    
-    # 3. Verifiche
-    assert "ZucchettiLlamaStrategy" in _model_instances
-    assert isinstance(model, ZucchettiLlamaStrategy)
+def test_get_model_cache_behavior(mock_openai):
+    from src.model_strategies import get_model, ZucchettiLlamaStrategy
+
+    get_model.cache_clear()
+
+    model1 = get_model(ZucchettiLlamaStrategy)
+    model2 = get_model(ZucchettiLlamaStrategy)
+
+    assert model1 is model2
+    assert mock_openai.call_count == 1
