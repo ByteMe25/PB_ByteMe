@@ -16,7 +16,7 @@ class OperationConfig:
 OPERATION_MAPPER: dict[str, OperationConfig] = {
     # Operazioni editoriali standard → Llama 3.2 (per ora)
     "summary":   OperationConfig(model_strategies.ZucchettiLlamaStrategy, STRATEGIES["summary"]),
-    "fix_grammar": OperationConfig(model_strategies.ZucchettiLlamaStrategy, STRATEGIES["fix_grammar"]),
+    "fix_grammar": OperationConfig(model_strategies.Gemma3Strategy, STRATEGIES["fix_grammar"]),
     "rewrite":    OperationConfig(model_strategies.ZucchettiLlamaStrategy, STRATEGIES["rewrite"]),
     "distant_writing":       OperationConfig(model_strategies.ZucchettiLlamaStrategy, STRATEGIES["distant_writing"]),
 
@@ -29,12 +29,12 @@ OPERATION_MAPPER: dict[str, OperationConfig] = {
     "blue_hat":   OperationConfig(model_strategies.Gemma3Strategy, STRATEGIES["blue_hat"]),
  
     # Traduzioni → Llama 3.2 (per ora)
-    "translate_it": OperationConfig(model_strategies.ZucchettiLlamaStrategy, STRATEGIES["translate_it"]),
-    "translate_en": OperationConfig(model_strategies.ZucchettiLlamaStrategy, STRATEGIES["translate_en"]),
-    "translate_es": OperationConfig(model_strategies.ZucchettiLlamaStrategy, STRATEGIES["translate_es"]),
-    "translate_fr": OperationConfig(model_strategies.ZucchettiLlamaStrategy, STRATEGIES["translate_fr"]),
-    "translate_de": OperationConfig(model_strategies.ZucchettiLlamaStrategy, STRATEGIES["translate_de"]),
-    "translate_zh": OperationConfig(model_strategies.ZucchettiLlamaStrategy, STRATEGIES["translate_zh"]),
+    "translate_it": OperationConfig(model_strategies.Gemma3Strategy, STRATEGIES["translate_it"]),
+    "translate_en": OperationConfig(model_strategies.Gemma3Strategy, STRATEGIES["translate_en"]),
+    "translate_es": OperationConfig(model_strategies.Gemma3Strategy, STRATEGIES["translate_es"]),
+    "translate_fr": OperationConfig(model_strategies.Gemma3Strategy, STRATEGIES["translate_fr"]),
+    "translate_de": OperationConfig(model_strategies.Gemma3Strategy, STRATEGIES["translate_de"]),
+    "translate_zh": OperationConfig(model_strategies.Gemma3Strategy, STRATEGIES["translate_zh"]),
 
 }
 
