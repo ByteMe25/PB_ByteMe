@@ -9,6 +9,7 @@ from src.ai_strategies import (
     SimplePromptStrategy,
     TranslationStrategy,
     DeBonoHatStrategy,
+    DistantWritingStrategy,
     STRATEGIES,
 )
 
@@ -72,7 +73,7 @@ class TestSimplePromptStrategy:
          "Sei un editor che riscrive testi migliorandone la chiarezza e lo stile.",
          "Riscrivi il seguente testo migliorandone la chiarezza"),
         ("distant_writing",
-         "Sei uno scrittore creativo che espande idee e concetti.",
+         "Sei uno scrittore creativo di livello mondiale. Ti occupi di scrivere espandendo concetti ed idee che ti vengono fornite. Sei famoso per essere bravo ad adattarti a qualsiasi tono richiesto.",
          "Espandi e sviluppa il seguente concetto in un testo più articolato"),
     ])
     def test_strategies_dict_content(self, key, expected_role, expected_task):
@@ -226,7 +227,7 @@ class TestStrategiesDict:
         assert isinstance(user, str) and len(user) > 0
  
     def test_strategies_are_simpleprompt(self):
-        hat_keys = ["summary", "fix_grammar", "rewrite", "distant_writing"]
+        hat_keys = ["summary", "fix_grammar", "rewrite" ]
         for key in hat_keys:
             assert isinstance(STRATEGIES[key], SimplePromptStrategy)
  

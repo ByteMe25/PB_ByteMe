@@ -18,7 +18,7 @@ OPERATION_MAPPER: dict[str, OperationConfig] = {
     "summary":   OperationConfig(model_strategies.ZucchettiLlamaStrategy, STRATEGIES["summary"]),
     "fix_grammar": OperationConfig(model_strategies.Gemma3Strategy, STRATEGIES["fix_grammar"]),
     "rewrite":    OperationConfig(model_strategies.ZucchettiLlamaStrategy, STRATEGIES["rewrite"]),
-    "distant_writing":       OperationConfig(model_strategies.ZucchettiLlamaStrategy, STRATEGIES["distant_writing"]),
+    "distant_writing":       OperationConfig(model_strategies.ZucchettiDeepSeekStrategy, STRATEGIES["distant_writing"]),
 
     # Sei Cappelli di De Bono → Gemma3:4B
     "white_hat":  OperationConfig(model_strategies.Gemma3Strategy, STRATEGIES["white_hat"]),

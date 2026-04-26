@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import MagicMock, patch
-from src.model_strategies import ZucchettiLlamaStrategy, Gemma3Strategy, get_model, AIModelStrategy
+from src.model_strategies import ZucchettiDeepSeekStrategy, ZucchettiLlamaStrategy, Gemma3Strategy, get_model, AIModelStrategy
 from openai import OpenAIError 
 
 # ---------------------------------------------------------------------------
@@ -40,7 +40,7 @@ def test_zucchetti_llama_generate(mock_openai_class):
     
     # Simula la struttura della risposta di OpenAI: response.choices[0].message.content
     mock_response = MagicMock()
-    mock_response.choices = [MagicMock(message=MagicMock(content="Risposta generata!"))]
+    mock_response.choices = [MagicMock(message=MagicMock(content="Risposta Llama!"))]
     mock_client.chat.completions.create.return_value = mock_response
 
     # Esecuzione
@@ -48,11 +48,41 @@ def test_zucchetti_llama_generate(mock_openai_class):
     result = strategy.generate("Prompt Sistema", "Prompt Utente")
 
     # Verifiche (Assertions)
-    assert result == "Risposta generata!"
+    assert result == "Risposta Llama!"
     
     # Verifica che la chiamata al client sia stata fatta con i parametri giusti
     mock_client.chat.completions.create.assert_called_once_with(
         model="llama3.2:3b",
+        messages=[
+            {"role": "system", "content": "Prompt Sistema"},
+            {"role": "user", "content": "Prompt Utente"}
+        ],
+        temperature=0.5
+    )
+
+@patch('src.model_strategies.OpenAI') # Simula la classe OpenAI
+def test_zucchetti_deepSeek_generate(mock_openai_class):
+    """Verifica che la strategia chiami correttamente il client OpenAI."""
+    
+    # Configuriamo il "finto" client OpenAI
+    mock_client = MagicMock()
+    mock_openai_class.return_value = mock_client
+    
+    # Simula la struttura della risposta di OpenAI: response.choices[0].message.content
+    mock_response = MagicMock()
+    mock_response.choices = [MagicMock(message=MagicMock(content="Risposta DeepSeek!"))]
+    mock_client.chat.completions.create.return_value = mock_response
+
+    # Esecuzione
+    strategy = ZucchettiDeepSeekStrategy()
+    result = strategy.generate("Prompt Sistema", "Prompt Utente")
+
+    # Verifiche (Assertions)
+    assert result == "Risposta DeepSeek!"
+    
+    # Verifica che la chiamata al client sia stata fatta con i parametri giusti
+    mock_client.chat.completions.create.assert_called_once_with(
+        model="deepseek-r1:8b",
         messages=[
             {"role": "system", "content": "Prompt Sistema"},
             {"role": "user", "content": "Prompt Utente"}

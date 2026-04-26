@@ -95,7 +95,7 @@ STRATEGIES: dict[str, BaseAIStrategy] = {
         task="Riscrivi il seguente testo migliorandone la chiarezza"
     ),
     'distant_writing': DistantWritingStrategy(
-        role="Sei uno scrittore creativo che espande idee e concetti."
+        role="Sei uno scrittore creativo di livello mondiale. Ti occupi di scrivere espandendo concetti ed idee che ti vengono fornite. Sei famoso per essere bravo ad adattarti a qualsiasi tono richiesto."
     ),
 
     # 6 Cappelli di De Bono

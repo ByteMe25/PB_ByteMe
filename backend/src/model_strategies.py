@@ -43,6 +43,26 @@ class ZucchettiLlamaStrategy(AIModelStrategy):
         )
         return response.choices[0].message.content
     
+class ZucchettiDeepSeekStrategy(AIModelStrategy):
+    """Strategia per il modello DeepSeek: 8b via infrastruttura Zucchetti."""
+    def __init__(self):
+        self.client = OpenAI(
+            api_key=os.getenv("OPENAI_API_KEY"),
+            base_url=os.getenv("OPENAI_BASE_URL")
+        )
+        self.model = "deepseek-r1:8b"
+
+    def generate(self, system_prompt: str, user_prompt: str, temperature: float = 0.5) -> str:
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            temperature=temperature
+        )
+        return response.choices[0].message.content
+    
 
 class Gemma3Strategy(AIModelStrategy):
     """Strategia per il modello Gemma3:4b via infrastruttura Zucchetti."""
