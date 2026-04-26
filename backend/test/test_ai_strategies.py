@@ -72,9 +72,6 @@ class TestSimplePromptStrategy:
         ("rewrite",
          "Sei un editor che riscrive testi migliorandone la chiarezza e lo stile.",
          "Riscrivi il seguente testo migliorandone la chiarezza"),
-        ("distant_writing",
-         "Sei uno scrittore creativo di livello mondiale. Ti occupi di scrivere espandendo concetti ed idee che ti vengono fornite. Sei famoso per essere bravo ad adattarti a qualsiasi tono richiesto.",
-         "Espandi e sviluppa il seguente concetto in un testo più articolato"),
     ])
     def test_strategies_dict_content(self, key, expected_role, expected_task):
         system, user = STRATEGIES[key].build("Testo di prova.")
@@ -190,6 +187,32 @@ class TestDeBonoHatStrategy:
     def test_blue_hat_system_prompt_mentions_process(self):
         system, _ = STRATEGIES["blue_hat"].build("Testo.")
         assert "processo" in system.lower() or "sintesi" in system.lower()
+
+
+# ──────────────────────────────────────────────
+# DistantWritingStrategy
+# ──────────────────────────────────────────────
+class TestDistantWritingStrategy:
+    def test_distant_writing_build_prompts(self):
+        """Verifica che il Distant Writing inserisca correttamente il prompt utente e il contesto."""
+        # Recupera l'istanza dal dizionario globale delle strategie
+        strategy = STRATEGIES["distant_writing"]
+        
+        testo_contesto = "Il protagonista entra nella stanza buia."
+        prompt_utente = "Continua la storia con un tono horror."
+        
+        # Il distant writing riceve sia il text che il prompt
+        system_prompt, user_prompt = strategy.build(text=testo_contesto, prompt=prompt_utente)
+        
+        # Verifica che ritorni due stringhe valide
+        assert isinstance(system_prompt, str)
+        assert isinstance(user_prompt, str)
+        
+        # Verifica che il prompt personalizzato dell'utente sia stato elaborato e inserito
+        assert prompt_utente in system_prompt or prompt_utente in user_prompt
+        
+        # Verifica che il testo di contesto sia stato mantenuto
+        assert testo_contesto in system_prompt or testo_contesto in user_prompt
 
 
 # ──────────────────────────────────────────────

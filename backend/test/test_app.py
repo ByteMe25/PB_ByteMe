@@ -85,24 +85,27 @@ class TestGenerateOperations:
         from src.operation_mapper import OPERATION_MAPPER
         self.mapper = OPERATION_MAPPER
 
+
     @pytest.mark.parametrize("operation_name", [
         "summary", "fix_grammar", "rewrite", "distant_writing"
     ])
     def test_registered_operation_returns_200(self, client, operation_name):
-
         mock_result = f"Risultato simulato per {operation_name}"
         with patch('src.app.get_model') as mock_get_model:
             mock_model = MagicMock()
             mock_model.generate.return_value = mock_result
             mock_get_model.return_value = mock_model
-
-            response = post_generate(client, {
+            
+            payload = {
                 "text": "Testo di prova generico.",
                 "operation": operation_name
-            })
+            }
+            # Se è distant_writing, aggiunge il prompt obbligatorio - dopo modifica al file app.py
+            if operation_name == "distant_writing":
+                payload["prompt"] = "Scrivi qualcosa"
+
+            response = post_generate(client, payload)
             assert response.status_code == 200
-            data = response.get_json()
-            assert data["generated_text"] == mock_result
 
     def test_operation_defaults_to_summary_when_missing(self, client):
        

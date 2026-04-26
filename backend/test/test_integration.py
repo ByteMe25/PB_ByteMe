@@ -137,7 +137,7 @@ def test_missing_text_returns_400(client):
         "operation": "summary", "text": "",
     })
     assert resp.status_code == 400
-    assert "message" in resp.get_json()
+    assert "generated_text" in resp.get_json()
 
 
 def test_distant_writing_without_prompt_returns_400(client):
@@ -153,7 +153,7 @@ def test_model_exception_returns_500(client, mock_model):
         "text": "Testo qualunque.", "operation": "summary",
     })
     assert resp.status_code == 500
-    assert "message" in resp.get_json()
+    assert "generated_text" in resp.get_json()
 
 
 # Fallback DEFAULT_OPERATION

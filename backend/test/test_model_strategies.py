@@ -13,7 +13,7 @@ def test_base_strategy_raises_not_implemented():
         strategy.generate("system", "user")
 
 # ---------------------------------------------------------------------------
-# 2. Test del Singleton / Factory (get_model)
+# 2. Test del Singleton/cache (get_model)
 # ---------------------------------------------------------------------------
 def test_get_model_cache_clear():
     class TestStrategy(AIModelStrategy): pass
@@ -89,6 +89,7 @@ def test_zucchetti_deepSeek_generate(mock_openai_class):
         ],
         temperature=0.5
     )
+
 # Test per Qwen3Strategy
 @patch('src.model_strategies.OpenAI') # Simula la classe OpenAI
 def test_qwen3_generate(mock_openai_class):

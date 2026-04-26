@@ -21,14 +21,14 @@ def generate_ai_text():
     data = request.json
     text = data.get('text', '')
     prompt = data.get('prompt', '')
-    operation = data.get('operationId', DEFAULT_OPERATION)
+    operation = data.get('operationId', data.get('operation', DEFAULT_OPERATION))
 
     if operation == 'distant_writing':
         if not prompt:
-            return jsonify({"message": "❌ Nessun prompt fornito."}), 400
+            return jsonify({"generated_text": "❌ Nessun prompt fornito."}), 400
     else:
         if not text:
-            return jsonify({"message": "❌ Nessun testo fornito."}), 400
+            return jsonify({"generated_text": "❌ Nessun testo fornito."}), 400
 
     # Recupera la configurazione (modello + prompt) dal Mapper
     config = OPERATION_MAPPER.get(operation) or OPERATION_MAPPER[DEFAULT_OPERATION]
@@ -52,7 +52,7 @@ def generate_ai_text():
     except Exception as e:
         # Log dell'errore sul terminale per debugging
         print(f"❌ Errore durante la generazione:\n{traceback.format_exc()}")
-        return jsonify({"message": f"❌ Errore critico:\n{str(e)}"}), 500
+        return jsonify({"generated_text": f"❌ Errore critico:\n{str(e)}"}), 500
 
 @app.route('/')
 def root():
