@@ -83,3 +83,23 @@ class Gemma3Strategy(AIModelStrategy):
             temperature=temperature,
         )
         return response.choices[0].message.content
+
+class Qwen3Strategy(AIModelStrategy):
+    """Strategia per il modello Qwen3:30b via infrastruttura Zucchetti."""
+    def __init__(self):
+        self.client = OpenAI(
+            api_key=os.getenv("OPENAI_API_KEY"),
+            base_url=os.getenv("OPENAI_BASE_URL")
+        )
+        self.model = "qwen3:30b"
+
+    def generate(self, system_prompt: str, user_prompt: str, temperature: float = 0.5) -> str:
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user",   "content": user_prompt},
+            ],
+            temperature=temperature,
+        )
+        return response.choices[0].message.content

@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import MagicMock, patch
-from src.model_strategies import ZucchettiDeepSeekStrategy, ZucchettiLlamaStrategy, Gemma3Strategy, get_model, AIModelStrategy
+from src.model_strategies import ZucchettiDeepSeekStrategy, ZucchettiLlamaStrategy, Gemma3Strategy, Qwen3Strategy, get_model, AIModelStrategy
 from openai import OpenAIError 
 
 # ---------------------------------------------------------------------------
@@ -83,6 +83,33 @@ def test_zucchetti_deepSeek_generate(mock_openai_class):
     # Verifica che la chiamata al client sia stata fatta con i parametri giusti
     mock_client.chat.completions.create.assert_called_once_with(
         model="deepseek-r1:8b",
+        messages=[
+            {"role": "system", "content": "Prompt Sistema"},
+            {"role": "user", "content": "Prompt Utente"}
+        ],
+        temperature=0.5
+    )
+# Test per Qwen3Strategy
+@patch('src.model_strategies.OpenAI') # Simula la classe OpenAI
+def test_qwen3_generate(mock_openai_class):
+    """Verifica che la strategia chiami correttamente il client OpenAI."""   
+    mock_client = MagicMock()
+    mock_openai_class.return_value = mock_client
+    
+    mock_response = MagicMock()
+    mock_response.choices = [MagicMock(message=MagicMock(content="Risposta Qwen!"))]
+    mock_client.chat.completions.create.return_value = mock_response
+
+    # Esecuzione
+    strategy = Qwen3Strategy()
+    result = strategy.generate("Prompt Sistema", "Prompt Utente")
+
+    # Verifiche (Assertions)
+    assert result == "Risposta Qwen!"
+    
+    # Verifica che la chiamata al client sia stata fatta con i parametri giusti
+    mock_client.chat.completions.create.assert_called_once_with(
+        model="qwen3:30b",
         messages=[
             {"role": "system", "content": "Prompt Sistema"},
             {"role": "user", "content": "Prompt Utente"}
