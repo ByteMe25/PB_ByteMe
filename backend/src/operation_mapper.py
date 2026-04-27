@@ -17,7 +17,7 @@ OPERATION_MAPPER: dict[str, OperationConfig] = {
     # Operazioni editoriali standard → Llama 3.2 (per ora)
     "summary":   OperationConfig(model_strategies.Qwen3Strategy, STRATEGIES["summary"]),
     "fix_grammar": OperationConfig(model_strategies.Gemma3Strategy, STRATEGIES["fix_grammar"]),
-    "rewrite":    OperationConfig(model_strategies.ZucchettiLlamaStrategy, STRATEGIES["rewrite"]),
+    "rewrite":    OperationConfig(model_strategies.Gemma3Strategy, STRATEGIES["rewrite"]),
     "distant_writing":       OperationConfig(model_strategies.ZucchettiDeepSeekStrategy, STRATEGIES["distant_writing"]),
 
     # Sei Cappelli di De Bono → Gemma3:4B

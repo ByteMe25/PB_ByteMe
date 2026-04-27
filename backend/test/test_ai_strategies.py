@@ -104,7 +104,7 @@ class TestTranslationStrategy:
     def test_system_prompt_is_consistent_across_languages(self):
         """Il system prompt è sempre lo stesso indipendente dalla lingua."""
         s1 = TranslationStrategy("tedesco")
-        s2 = TranslationStrategy("cinese mandarino")
+        s2 = TranslationStrategy("francese")
         system1, _ = s1.build("Testo.")
         system2, _ = s2.build("Testo.")
         assert system1 == system2
@@ -115,7 +115,7 @@ class TestTranslationStrategy:
         assert s.temperature <= 0.4
 
     @pytest.mark.parametrize("language", [
-        "italiano", "inglese", "spagnolo", "francese", "tedesco", "cinese mandarino"
+        "italiano", "inglese", "spagnolo", "francese", "tedesco"
     ])
     def test_all_supported_languages(self, language):
         strategy = TranslationStrategy(language)

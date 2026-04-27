@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import MagicMock, patch
-from src.model_strategies import ZucchettiDeepSeekStrategy, ZucchettiLlamaStrategy, Gemma3Strategy, Qwen3Strategy, get_model, AIModelStrategy
+from src.model_strategies import ZucchettiDeepSeekStrategy, Gemma3Strategy, Qwen3Strategy, get_model, AIModelStrategy
 from openai import OpenAIError 
 
 # ---------------------------------------------------------------------------
@@ -30,35 +30,6 @@ def test_get_model_cache_clear():
 # ---------------------------------------------------------------------------
 # 3. Test della Strategia Zucchetti (con Mocking)
 # ---------------------------------------------------------------------------
-@patch('src.model_strategies.OpenAI') # Simula la classe OpenAI
-def test_zucchetti_llama_generate(mock_openai_class):
-    """Verifica che la strategia chiami correttamente il client OpenAI."""
-    
-    # Configuriamo il "finto" client OpenAI
-    mock_client = MagicMock()
-    mock_openai_class.return_value = mock_client
-    
-    # Simula la struttura della risposta di OpenAI: response.choices[0].message.content
-    mock_response = MagicMock()
-    mock_response.choices = [MagicMock(message=MagicMock(content="Risposta Llama!"))]
-    mock_client.chat.completions.create.return_value = mock_response
-
-    # Esecuzione
-    strategy = ZucchettiLlamaStrategy()
-    result = strategy.generate("Prompt Sistema", "Prompt Utente")
-
-    # Verifiche (Assertions)
-    assert result == "Risposta Llama!"
-    
-    # Verifica che la chiamata al client sia stata fatta con i parametri giusti
-    mock_client.chat.completions.create.assert_called_once_with(
-        model="llama3.2:3b",
-        messages=[
-            {"role": "system", "content": "Prompt Sistema"},
-            {"role": "user", "content": "Prompt Utente"}
-        ],
-        temperature=0.5
-    )
 
 @patch('src.model_strategies.OpenAI') # Simula la classe OpenAI
 def test_zucchetti_deepSeek_generate(mock_openai_class):
@@ -153,7 +124,7 @@ def test_zucchetti_llama_api_error(mock_openai_class):
     # Simula un errore generico dell'SDK OpenAI
     mock_client.chat.completions.create.side_effect = Exception("API Connection Error")
 
-    strategy = ZucchettiLlamaStrategy()
+    strategy = Gemma3Strategy()
     with pytest.raises(Exception) as excinfo:
         strategy.generate("sys", "user")
     
@@ -190,7 +161,7 @@ def test_zucchetti_llama_missing_env_vars():
     with patch.dict('os.environ', {}, clear=True):
         # Ci aspettiamo che l'inizializzazione fallisca subito
         with pytest.raises(OpenAIError) as excinfo:
-            ZucchettiLlamaStrategy()   
+            Gemma3Strategy()   
         # Verifichiamo che il messaggio di errore sia quello giusto
         assert "api_key" in str(excinfo.value)
 
@@ -205,18 +176,18 @@ def test_zucchetti_llama_empty_response(mock_openai_class):
     mock_response.choices = [] 
     mock_client.chat.completions.create.return_value = mock_response
 
-    strategy = ZucchettiLlamaStrategy()
+    strategy = Gemma3Strategy()
     with pytest.raises(IndexError): # O l'errore che ti aspetti
         strategy.generate("sys", "user")
 
 @patch('src.model_strategies.OpenAI')
 def test_get_model_cache_behavior(mock_openai):
-    from src.model_strategies import get_model, ZucchettiLlamaStrategy
+    from src.model_strategies import get_model, Gemma3Strategy
 
     get_model.cache_clear()
 
-    model1 = get_model(ZucchettiLlamaStrategy)
-    model2 = get_model(ZucchettiLlamaStrategy)
+    model1 = get_model(Gemma3Strategy)
+    model2 = get_model(Gemma3Strategy)
 
     assert model1 is model2
     assert mock_openai.call_count == 1

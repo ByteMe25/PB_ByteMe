@@ -206,6 +206,5 @@ STRATEGIES: dict[str, BaseAIStrategy] = {
     'translate_en': TranslationStrategy("inglese"),
     'translate_es': TranslationStrategy("spagnolo"),
     'translate_fr': TranslationStrategy("francese"),
-    'translate_de': TranslationStrategy("tedesco"),
-    'translate_zh': TranslationStrategy("cinese mandarino"),
+    'translate_de': TranslationStrategy("tedesco")
 }

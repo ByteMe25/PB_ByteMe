@@ -82,7 +82,6 @@ def test_temperature_is_forwarded_to_model(client, mock_model):
     ("translate_fr", "francese"),
     ("translate_de", "tedesco"),
     ("translate_es", "spagnolo"),
-    ("translate_zh", "cinese"),
 ])
 def test_translation_prompt_contains_language(client, mock_model, operation, expected_in_user_prompt):
     client.post("/api/ai/generate", json={
