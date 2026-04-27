@@ -34,7 +34,6 @@ OPERATION_MAPPER: dict[str, OperationConfig] = {
     "translate_es": OperationConfig(model_strategies.Gemma3Strategy, STRATEGIES["translate_es"]),
     "translate_fr": OperationConfig(model_strategies.Gemma3Strategy, STRATEGIES["translate_fr"]),
     "translate_de": OperationConfig(model_strategies.Gemma3Strategy, STRATEGIES["translate_de"]),
-    "translate_zh": OperationConfig(model_strategies.Gemma3Strategy, STRATEGIES["translate_zh"]),
 
 }
 
