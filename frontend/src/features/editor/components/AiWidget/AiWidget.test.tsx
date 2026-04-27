@@ -148,16 +148,16 @@ describe('AiWidget Component', () => {
       expect(screen.getByText('Connessione persa')).toBeInTheDocument();
     });
 
-    it('mostra il pulsante Scarta', () => {
+    it('mostra il pulsante Annulla', () => {
       setWidgetState(new ErrorState('Errore generico', mockOnDiscard));
       render(<AiWidget />);
-      expect(screen.getByRole('button', { name: 'Scarta' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Annulla' })).toBeInTheDocument();
     });
 
-    it('chiama onDiscard quando si clicca Scarta', () => {
+    it('chiama onDiscard quando si clicca Annulla', () => {
       setWidgetState(new ErrorState('Errore', mockOnDiscard));
       render(<AiWidget />);
-      fireEvent.click(screen.getByRole('button', { name: 'Scarta' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Annulla' }));
       expect(mockOnDiscard).toHaveBeenCalled();
     });
   });

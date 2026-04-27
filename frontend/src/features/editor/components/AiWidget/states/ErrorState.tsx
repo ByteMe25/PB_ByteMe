@@ -12,7 +12,7 @@ export class ErrorState implements IWidgetState {
   render() {
     return (
       <>
-        <MessageSquareWarning size={22}/>
+        <MessageSquareWarning size={25} color="#d32f2f" />
         <span className={styles.error_message}>{this.message}</span>
       </>
     )
@@ -21,7 +21,7 @@ export class ErrorState implements IWidgetState {
   renderActions() {
     return (
       <>
-        <button onClick={this.onDiscard}>Scarta</button>
+        <button className={styles.btn_cancel} onClick={this.onDiscard}>Annulla</button>
       </>
     )
   }

@@ -1,5 +1,6 @@
 import React from 'react'
 import { IWidgetState } from './IWidgetState'
+import styles from '../AiWidget.module.css'
 
 export class DoneState implements IWidgetState {
   constructor(
@@ -16,11 +17,11 @@ export class DoneState implements IWidgetState {
   renderActions() {
     return (
       <>
-        <button onClick={() => this.onInsert(this.result)}>Inserisci</button>
+        <button className={styles.btn_confirm} onClick={() => this.onInsert(this.result)}>Inserisci</button>
         {this.onRegenerate && (
           <button onClick={this.onRegenerate}>Rigenera</button>
         )}
-        <button onClick={this.onDiscard}>Scarta</button>
+        <button className={styles.btn_cancel} onClick={this.onDiscard}>Scarta</button>
       </>
     )
   }

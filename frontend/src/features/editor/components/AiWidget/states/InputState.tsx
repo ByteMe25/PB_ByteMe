@@ -36,7 +36,7 @@ function InputStateView({ onConfirm, initialPrompt }: {
         placeholder="Descrivi qualcosa per iniziare la generazione…"
       />
       <button
-        className={styles.btn_confirm}
+        className={styles.input_confirm}
         onClick={() => onConfirm(prompt)}
         disabled={!prompt.trim()}
       >
