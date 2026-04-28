@@ -13,7 +13,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Configurazione ambiente
+ENV PYTHONPATH="/app/backend"
 EXPOSE 8000
 
 # Comando di avvio (percorso corretto relativo a WORKDIR)
-CMD ["python", "backend/src/app.py"]
+CMD ["python", "/app/backend/src/app.py"]
