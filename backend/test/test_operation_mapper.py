@@ -50,7 +50,7 @@ def test_summary_uses_correct_strategy():
 
 def test_fix_grammar_uses_correct_strategy():
     """Verifica che 'fix_grammar' istruisca l'IA a correggere la grammatica."""
-    config = OPERATION_REGISTRY["fix_grammar"]
+    config = OPERATION_MAPPER["fix_grammar"]
     # Generiamo il prompt di sistema
     sys_prompt, _ = config.prompt_strategy.build("test")
     
@@ -60,7 +60,7 @@ def test_fix_grammar_uses_correct_strategy():
 
 def test_rewrite_uses_correct_strategy():
     """Verifica che 'rewrite' istruisca l'IA a riscrivere il testo."""
-    config = OPERATION_REGISTRY["rewrite"]
+    config = OPERATION_MAPPER["rewrite"]
     # Recuperiamo entrambi i prompt
     sys_prompt, user_prompt = config.prompt_strategy.build("test")
     
@@ -71,14 +71,15 @@ def test_rewrite_uses_correct_strategy():
 
 def test_distant_writing_uses_correct_strategy():
     """Verifica che 'distant_writing' faccia quello che c'è scritto nel prompt (Espansione)."""
-    config = OPERATION_REGISTRY["distant_writing"]
+    config = OPERATION_MAPPER["distant_writing"]
     sys_prompt, user_prompt = config.prompt_strategy.build("test")
     full_content = (sys_prompt + user_prompt).lower()
     assert "espandi" in full_content or "sviluppa" in full_content or "articolato" in full_content
+
+
 # ---------------------------------------------------------------------------
 # 3. Test di Robustezza (Cosa non deve succedere)
 # ---------------------------------------------------------------------------
-
 def test_mapper_values_not_none():
     """Verifica che nessuna operazione sia configurata a None."""
     for op_name, config in OPERATION_MAPPER.items():
