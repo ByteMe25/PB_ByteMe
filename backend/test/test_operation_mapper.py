@@ -74,7 +74,7 @@ def test_distant_writing_uses_correct_strategy():
     config = OPERATION_MAPPER["distant_writing"]
     sys_prompt, user_prompt = config.prompt_strategy.build("test")
     full_content = (sys_prompt + user_prompt).lower()
-    assert "espandi" in full_content or "sviluppa" in full_content or "articolato" in full_content
+    assert "espandendo" in full_content or "scrittore creativo" in full_content
 
 
 # ---------------------------------------------------------------------------
