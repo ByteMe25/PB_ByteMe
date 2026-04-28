@@ -1,6 +1,8 @@
 import os
 from openai import OpenAI
 from typing import Type
+from functools import lru_cache
+from typing import Type
 
 class AIModelStrategy:
     """
@@ -15,27 +17,21 @@ class AIModelStrategy:
     
 
 
-_model_instances: dict[str, AIModelStrategy] = {}
-
+@lru_cache(maxsize=None)
 def get_model(model_class: Type[AIModelStrategy]) -> AIModelStrategy:
-    """
-    Restituisce sempre la stessa istanza per una data classe.
-    Se l'istanza non esiste ancora, la crea e la mette in cache.
-    """
-    key = model_class.__name__
-    if key not in _model_instances:
-        _model_instances[key] = model_class()
-    return _model_instances[key]
+    return model_class()
+
 
 # Strategie concrete
-class ZucchettiLlamaStrategy(AIModelStrategy):
-    """Strategia per il modello Llama3.2:3b via infrastruttura Zucchetti."""
+    
+class ZucchettiDeepSeekStrategy(AIModelStrategy):
+    """Strategia per il modello DeepSeek: 8b via infrastruttura Zucchetti."""
     def __init__(self):
         self.client = OpenAI(
             api_key=os.getenv("OPENAI_API_KEY"),
             base_url=os.getenv("OPENAI_BASE_URL")
         )
-        self.model = "llama3.2:3b"
+        self.model = "deepseek-r1:8b"
 
     def generate(self, system_prompt: str, user_prompt: str, temperature: float = 0.5) -> str:
         response = self.client.chat.completions.create(
@@ -57,6 +53,26 @@ class Gemma3Strategy(AIModelStrategy):
             base_url=os.getenv("OPENAI_BASE_URL")
         )
         self.model = "gemma3:4b"
+
+    def generate(self, system_prompt: str, user_prompt: str, temperature: float = 0.5) -> str:
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user",   "content": user_prompt},
+            ],
+            temperature=temperature,
+        )
+        return response.choices[0].message.content
+
+class Qwen3Strategy(AIModelStrategy):
+    """Strategia per il modello Qwen3:30b via infrastruttura Zucchetti."""
+    def __init__(self):
+        self.client = OpenAI(
+            api_key=os.getenv("OPENAI_API_KEY"),
+            base_url=os.getenv("OPENAI_BASE_URL")
+        )
+        self.model = "qwen3:30b"
 
     def generate(self, system_prompt: str, user_prompt: str, temperature: float = 0.5) -> str:
         response = self.client.chat.completions.create(

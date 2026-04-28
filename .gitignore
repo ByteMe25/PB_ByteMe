@@ -10,3 +10,10 @@ backend/venv/
 # Docker & OS
 .DS_Store
 .env
+
+.vscode/
+
+# Playwright test output
+frontend/playwright-report/
+frontend/test-results/
+frontend/playwright/.cache/

@@ -1,0 +1,1 @@
+// Definizioni TypeScript globali per interfacce file e props dei componenti UI

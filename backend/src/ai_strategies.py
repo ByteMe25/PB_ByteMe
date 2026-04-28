@@ -11,7 +11,7 @@ class BaseAIStrategy:
         if text is None:
             raise TypeError("Il testo non può essere None")
 
-    def build(self, text: str)-> tuple[str, str]:
+    def build(self, text: str, prompt: str = '')-> tuple[str, str]:
         raise NotImplementedError("Ogni strategia deve implementare il metodo build")
 
 
@@ -24,7 +24,7 @@ class SimplePromptStrategy(BaseAIStrategy):
         self.role = role
         self.task = task
 
-    def build(self, text: str)-> tuple[str, str]:
+    def build(self, text: str, prompt: str = '')-> tuple[str, str]:
         self._validate(text)
         system_prompt = f"{self.role} NON usare frasi introduttive, rispondi SOLO con il risultato richiesto."
         user_prompt = f"{self.task}:\n\n{text}"
@@ -39,7 +39,7 @@ class TranslationStrategy(BaseAIStrategy):
     def __init__(self, language: str):
         self.language = language
 
-    def build(self, text: str)-> tuple[str, str]:
+    def build(self, text: str, prompt: str = '')-> tuple[str, str]:
         self._validate(text)
         system_prompt = "Sei un traduttore professionista. Rispondi SOLO con il testo tradotto, senza frasi introduttive."
         user_prompt = f"Traduci in {self.language}:\n\n{text}"
@@ -54,11 +54,29 @@ class DeBonoHatStrategy(BaseAIStrategy):
         self._user_task = user_task
         self.temperature = temperature
 
-    def build(self, text: str)-> tuple[str, str]:
+    def build(self, text: str, prompt: str = '')-> tuple[str, str]:
         self._validate(text)
         user_prompt = f"{self._user_task}\n\n{text}"
         return self._system_prompt, user_prompt
 
+class DistantWritingStrategy(BaseAIStrategy):
+    temperature = 0.7
+
+    def __init__(self, role: str):
+        self.role = role
+
+    def _validate(self, text: str) -> None:
+        pass
+
+    def build(self, text: str, prompt: str = '') -> tuple[str, str]:
+        system_prompt = f"{self.role} NON usare frasi introduttive, rispondi SOLO con il testo generato."
+        
+        if text:
+            user_prompt = f"{prompt}\n\nContesto:\n{text}"
+        else:
+            user_prompt = prompt
+            
+        return system_prompt, user_prompt
 
 # --- MAPPATURA DELLE STRATEGIE ---
 STRATEGIES: dict[str, BaseAIStrategy] = {
@@ -76,9 +94,8 @@ STRATEGIES: dict[str, BaseAIStrategy] = {
         role="Sei un editor che riscrive testi migliorandone la chiarezza e lo stile.",
         task="Riscrivi il seguente testo migliorandone la chiarezza"
     ),
-    'distant_writing': SimplePromptStrategy(
-        role="Sei uno scrittore creativo che espande idee e concetti.",
-        task="Espandi e sviluppa il seguente concetto in un testo più articolato"
+    'distant_writing': DistantWritingStrategy(
+        role="Sei uno scrittore creativo di livello mondiale. Ti occupi di scrivere espandendo concetti ed idee che ti vengono fornite. Sei famoso per essere bravo ad adattarti a qualsiasi tono richiesto."
     ),
 
     # 6 Cappelli di De Bono
@@ -189,6 +206,5 @@ STRATEGIES: dict[str, BaseAIStrategy] = {
     'translate_en': TranslationStrategy("inglese"),
     'translate_es': TranslationStrategy("spagnolo"),
     'translate_fr': TranslationStrategy("francese"),
-    'translate_de': TranslationStrategy("tedesco"),
-    'translate_zh': TranslationStrategy("cinese mandarino"),
+    'translate_de': TranslationStrategy("tedesco")
 }

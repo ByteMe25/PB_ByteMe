@@ -9,6 +9,7 @@ from src.ai_strategies import (
     SimplePromptStrategy,
     TranslationStrategy,
     DeBonoHatStrategy,
+    DistantWritingStrategy,
     STRATEGIES,
 )
 
@@ -71,9 +72,6 @@ class TestSimplePromptStrategy:
         ("rewrite",
          "Sei un editor che riscrive testi migliorandone la chiarezza e lo stile.",
          "Riscrivi il seguente testo migliorandone la chiarezza"),
-        ("distant_writing",
-         "Sei uno scrittore creativo che espande idee e concetti.",
-         "Espandi e sviluppa il seguente concetto in un testo più articolato"),
     ])
     def test_strategies_dict_content(self, key, expected_role, expected_task):
         system, user = STRATEGIES[key].build("Testo di prova.")
@@ -106,7 +104,7 @@ class TestTranslationStrategy:
     def test_system_prompt_is_consistent_across_languages(self):
         """Il system prompt è sempre lo stesso indipendente dalla lingua."""
         s1 = TranslationStrategy("tedesco")
-        s2 = TranslationStrategy("cinese mandarino")
+        s2 = TranslationStrategy("francese")
         system1, _ = s1.build("Testo.")
         system2, _ = s2.build("Testo.")
         assert system1 == system2
@@ -117,7 +115,7 @@ class TestTranslationStrategy:
         assert s.temperature <= 0.4
 
     @pytest.mark.parametrize("language", [
-        "italiano", "inglese", "spagnolo", "francese", "tedesco", "cinese mandarino"
+        "italiano", "inglese", "spagnolo", "francese", "tedesco"
     ])
     def test_all_supported_languages(self, language):
         strategy = TranslationStrategy(language)
@@ -192,6 +190,32 @@ class TestDeBonoHatStrategy:
 
 
 # ──────────────────────────────────────────────
+# DistantWritingStrategy
+# ──────────────────────────────────────────────
+class TestDistantWritingStrategy:
+    def test_distant_writing_build_prompts(self):
+        """Verifica che il Distant Writing inserisca correttamente il prompt utente e il contesto."""
+        # Recupera l'istanza dal dizionario globale delle strategie
+        strategy = STRATEGIES["distant_writing"]
+        
+        testo_contesto = "Il protagonista entra nella stanza buia."
+        prompt_utente = "Continua la storia con un tono horror."
+        
+        # Il distant writing riceve sia il text che il prompt
+        system_prompt, user_prompt = strategy.build(text=testo_contesto, prompt=prompt_utente)
+        
+        # Verifica che ritorni due stringhe valide
+        assert isinstance(system_prompt, str)
+        assert isinstance(user_prompt, str)
+        
+        # Verifica che il prompt personalizzato dell'utente sia stato elaborato e inserito
+        assert prompt_utente in system_prompt or prompt_utente in user_prompt
+        
+        # Verifica che il testo di contesto sia stato mantenuto
+        assert testo_contesto in system_prompt or testo_contesto in user_prompt
+
+
+# ──────────────────────────────────────────────
 # Dizionario STRATEGIES
 # ──────────────────────────────────────────────
 class TestStrategiesDict:
@@ -200,7 +224,7 @@ class TestStrategiesDict:
         "summary", "fix_grammar", "rewrite", "distant_writing",
         "white_hat", "red_hat", "black_hat", "yellow_hat", "green_hat", "blue_hat",
         "translate_it", "translate_en", "translate_es",
-        "translate_fr", "translate_de", "translate_zh",
+        "translate_fr", "translate_de",
     ]
 
     def test_all_keys_present(self):
@@ -226,13 +250,13 @@ class TestStrategiesDict:
         assert isinstance(user, str) and len(user) > 0
  
     def test_strategies_are_simpleprompt(self):
-        hat_keys = ["summary", "fix_grammar", "rewrite", "distant_writing"]
+        hat_keys = ["summary", "fix_grammar", "rewrite" ]
         for key in hat_keys:
             assert isinstance(STRATEGIES[key], SimplePromptStrategy)
  
     def test_translate_strategies_are_translation(self):
         translate_keys = ["translate_it", "translate_en", "translate_es",
-                          "translate_fr", "translate_de", "translate_zh"]
+                          "translate_fr", "translate_de"]
         for key in translate_keys:
             assert isinstance(STRATEGIES[key], TranslationStrategy)
             
