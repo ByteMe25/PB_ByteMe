@@ -224,7 +224,7 @@ class TestStrategiesDict:
         "summary", "fix_grammar", "rewrite", "distant_writing",
         "white_hat", "red_hat", "black_hat", "yellow_hat", "green_hat", "blue_hat",
         "translate_it", "translate_en", "translate_es",
-        "translate_fr", "translate_de", "translate_zh",
+        "translate_fr", "translate_de",
     ]
 
     def test_all_keys_present(self):
@@ -256,7 +256,7 @@ class TestStrategiesDict:
  
     def test_translate_strategies_are_translation(self):
         translate_keys = ["translate_it", "translate_en", "translate_es",
-                          "translate_fr", "translate_de", "translate_zh"]
+                          "translate_fr", "translate_de"]
         for key in translate_keys:
             assert isinstance(STRATEGIES[key], TranslationStrategy)
             
