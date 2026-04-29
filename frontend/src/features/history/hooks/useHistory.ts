@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useHistoryStore } from '../store/useHistoryStore';
-import type { HistoryEntry } from '../types/HistoryEntry';
+
 
 //logica per il filtraggio
 export interface HistoryFilters {
